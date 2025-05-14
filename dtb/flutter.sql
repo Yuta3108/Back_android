@@ -24,8 +24,7 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `catego+
-ries`
+-- Cấu trúc bảng cho bảng `categories`
 --
 
 DROP TABLE IF EXISTS `categories`;
