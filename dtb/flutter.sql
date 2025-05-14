@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1:3306
--- Thời gian đã tạo: Th5 14, 2025 lúc 11:36 AM
+-- Thời gian đã tạo: Th5 14, 2025 lúc 01:53 PM
 -- Phiên bản máy phục vụ: 8.3.0
 -- Phiên bản PHP: 8.2.18
 
@@ -60,14 +60,15 @@ CREATE TABLE IF NOT EXISTS `chitietdonhang` (
   PRIMARY KEY (`machitiet`),
   KEY `madonhang` (`madonhang`,`masanpham`),
   KEY `FK_msanpham` (`masanpham`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `chitietdonhang`
 --
 
 INSERT INTO `chitietdonhang` (`machitiet`, `madonhang`, `masanpham`, `tonggia`) VALUES
-(1, 1, 1, 10000);
+(1, 1, 1, 10000),
+(5, 1, 2, 15000);
 
 -- --------------------------------------------------------
 
@@ -101,14 +102,14 @@ CREATE TABLE IF NOT EXISTS `donhang` (
   `phuongthucthanhtoan` varchar(10) NOT NULL,
   `soluong` int NOT NULL,
   PRIMARY KEY (`madonhang`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `donhang`
 --
 
 INSERT INTO `donhang` (`madonhang`, `ngaydat`, `tongtien`, `trangthai`, `ghichu`, `phuongthucthanhtoan`, `soluong`) VALUES
-(1, '0000-00-00', 10000, 'choxuly', '', 'cod', 1);
+(1, '2025-05-14', 10000, 'dathanhcong', '', 'cod', 1);
 
 -- --------------------------------------------------------
 
@@ -161,19 +162,19 @@ CREATE TABLE IF NOT EXISTS `products` (
 --
 
 INSERT INTO `products` (`id`, `name`, `price`, `category_id`, `img`) VALUES
-(1, 'Cà phê đen', 10000, 1, ''),
-(2, 'Cà phê sữa ', 13000, 1, ''),
-(3, 'Cà phê muối ngon hơn', 18000, 1, 'https://link-image-moi.jpg'),
-(4, 'Cà phê sữa dừa ', 25000, 1, ''),
-(5, 'Cà phê chồn', 50000, 1, ''),
-(6, 'Trà sữa truyền thống', 20000, 2, ''),
-(7, 'Trà sữa trân châu đường đen', 25000, 2, ''),
-(8, 'Trà sữa Atisô', 30000, 2, ''),
-(11, 'Sinh tố bơ', 25000, 3, ''),
-(13, 'Sinh tố dưa lưới', 25000, 3, ''),
-(16, 'Bò húc', 13000, 4, ''),
-(17, 'Nước suối', 10000, 4, ''),
-(20, 'Trà ôlong', 12000, 4, '');
+(1, 'Cà phê đen', 10000, 1, 'img/cfden.jpg'),
+(2, 'Cà phê sữa ', 13000, 1, 'img/cfsua.png'),
+(3, 'Cà phê muối ngon hơn', 18000, 1, 'img/cfmuoi.jpg'),
+(4, 'Cà phê sữa dừa ', 25000, 1, 'img/cfsuadua.jpg'),
+(5, 'Cà phê chồn', 50000, 1, 'img/cfchon.jpg'),
+(6, 'Trà sữa truyền thống', 20000, 2, 'img/trasuatt.jpg'),
+(7, 'Trà sữa trân châu đường đen', 25000, 2, 'img/trasuatcdd.jpg'),
+(8, 'Trà sữa Atisô', 30000, 2, 'img/trasuaatiso.jpg'),
+(11, 'Sinh tố bơ', 25000, 3, 'img/stbo.jpg'),
+(13, 'Sinh tố dưa lưới', 25000, 3, 'img/stdualuoi.jpg'),
+(16, 'Bò húc', 13000, 4, 'img/bohuc.jpg'),
+(17, 'Nước suối', 10000, 4, 'img/nuocsuoi.jpg'),
+(20, 'Trà ôlong', 12000, 4, 'img/olong.jpg');
 
 -- --------------------------------------------------------
 
