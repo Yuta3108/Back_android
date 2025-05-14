@@ -6,7 +6,8 @@ const cors = require("cors");
 const employeeRoutes = require('./routes/employeeRoutes');
 const productRoutes = require('./routes/productsRoutes');
 const categoryRoutes = require('./routes/categoriesRoutes');
-
+const ordersRoutes = require('./routes/ordersRoutes');
+const orderDetailsRoutes = require('./routes/orderDetailsRoutes');
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -94,6 +95,10 @@ app.use('/api/employees', employeeRoutes);
 app.use('/api/products', productRoutes);
 //api danh mục sản phẩm
 app.use('/api/categories', categoryRoutes);
+//api đơn hàng
+app.use('/api/orders', ordersRoutes);
+//api chi tiết đơn hàng
+app.use('/api/order-details', orderDetailsRoutes);
 
 // 📌 Chạy server
 const PORT = process.env.PORT || 5000;

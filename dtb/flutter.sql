@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1:3306
--- Thời gian đã tạo: Th5 14, 2025 lúc 08:52 AM
+-- Thời gian đã tạo: Th5 14, 2025 lúc 11:36 AM
 -- Phiên bản máy phục vụ: 8.3.0
 -- Phiên bản PHP: 8.2.18
 
@@ -24,8 +24,7 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `catego+
-ries`
+-- Cấu trúc bảng cho bảng `categories`
 --
 
 DROP TABLE IF EXISTS `categories`;
@@ -33,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `categories` (
   `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(250) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `categories`
@@ -43,7 +42,32 @@ INSERT INTO `categories` (`id`, `name`) VALUES
 (1, 'Cà phê'),
 (2, 'Trà sữa'),
 (3, 'Sinh tố'),
-(4, 'Nước giải khát');
+(4, 'Nước giải khát'),
+(7, 'đồ ăn, uống');
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `chitietdonhang`
+--
+
+DROP TABLE IF EXISTS `chitietdonhang`;
+CREATE TABLE IF NOT EXISTS `chitietdonhang` (
+  `machitiet` int NOT NULL AUTO_INCREMENT,
+  `madonhang` int NOT NULL,
+  `masanpham` int NOT NULL,
+  `tonggia` float NOT NULL,
+  PRIMARY KEY (`machitiet`),
+  KEY `madonhang` (`madonhang`,`masanpham`),
+  KEY `FK_msanpham` (`masanpham`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `chitietdonhang`
+--
+
+INSERT INTO `chitietdonhang` (`machitiet`, `madonhang`, `masanpham`, `tonggia`) VALUES
+(1, 1, 1, 10000);
 
 -- --------------------------------------------------------
 
@@ -74,9 +98,17 @@ CREATE TABLE IF NOT EXISTS `donhang` (
   `tongtien` float NOT NULL,
   `trangthai` varchar(50) NOT NULL,
   `ghichu` text NOT NULL,
-  `nguoitao` varchar(100) NOT NULL,
+  `phuongthucthanhtoan` varchar(10) NOT NULL,
+  `soluong` int NOT NULL,
   PRIMARY KEY (`madonhang`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `donhang`
+--
+
+INSERT INTO `donhang` (`madonhang`, `ngaydat`, `tongtien`, `trangthai`, `ghichu`, `phuongthucthanhtoan`, `soluong`) VALUES
+(1, '0000-00-00', 10000, 'choxuly', '', 'cod', 1);
 
 -- --------------------------------------------------------
 
@@ -122,7 +154,7 @@ CREATE TABLE IF NOT EXISTS `products` (
   `img` varchar(250) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `category_id` (`category_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `products`
@@ -131,7 +163,7 @@ CREATE TABLE IF NOT EXISTS `products` (
 INSERT INTO `products` (`id`, `name`, `price`, `category_id`, `img`) VALUES
 (1, 'Cà phê đen', 10000, 1, ''),
 (2, 'Cà phê sữa ', 13000, 1, ''),
-(3, 'Cà phê muối', 15000, 1, ''),
+(3, 'Cà phê muối ngon hơn', 18000, 1, 'https://link-image-moi.jpg'),
 (4, 'Cà phê sữa dừa ', 25000, 1, ''),
 (5, 'Cà phê chồn', 50000, 1, ''),
 (6, 'Trà sữa truyền thống', 20000, 2, ''),
@@ -232,6 +264,13 @@ INSERT INTO `users` (`id`, `email`, `password`) VALUES
 --
 -- Các ràng buộc cho các bảng đã đổ
 --
+
+--
+-- Các ràng buộc cho bảng `chitietdonhang`
+--
+ALTER TABLE `chitietdonhang`
+  ADD CONSTRAINT `FK_mdonhang` FOREIGN KEY (`madonhang`) REFERENCES `donhang` (`madonhang`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `FK_msanpham` FOREIGN KEY (`masanpham`) REFERENCES `products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Các ràng buộc cho bảng `chitietsanpham`
