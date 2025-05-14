@@ -4,6 +4,9 @@ const mysql = require("mysql2");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const employeeRoutes = require('./routes/employeeRoutes');
+const productRoutes = require('./routes/productsRoutes');
+const categoryRoutes = require('./routes/categoriesRoutes');
+
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -85,7 +88,13 @@ app.post("/api/login", (req, res) => {
         res.json({ message: "Đăng nhập thành công!", token });
     });
 });
+//api nhân viên
 app.use('/api/employees', employeeRoutes);
+//api sản phẩm
+app.use('/api/products', productRoutes);
+//api danh mục sản phẩm
+app.use('/api/categories', categoryRoutes);
+
 // 📌 Chạy server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server chạy trên cổng ${PORT}`));
