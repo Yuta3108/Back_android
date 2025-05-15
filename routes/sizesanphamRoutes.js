@@ -14,4 +14,7 @@ router.delete('/:masize', sizesanphamController.deleteSize);
 //Sửa 1 size sản phẩm
 router.put('/:masize', sizesanphamController.updateSize);
 
+// Lấy size theo mã sản phẩm
+router.get('/masanpham/:masanpham', sizesanphamController.getSizesByMaSanPham);
+
 module.exports = router;

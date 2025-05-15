@@ -73,3 +73,23 @@ exports.updateSize = (req, res) => {
   });
 };
 
+// Lấy size theo mã sản phẩm
+exports.getSizesByMaSanPham = (req, res) => {
+  const masanpham = req.params.masanpham;
+
+  const query = 'SELECT masize, size, gia FROM sizesanpham WHERE masanpham = ?';
+  db.query(query, [masanpham], (err, results) => {
+    if (err) {
+      console.error('Lỗi khi truy vấn:', err);
+      return res.status(500).json({ error: 'Lỗi server' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'Không tìm thấy size cho mã sản phẩm này.' });
+    }
+
+    res.json(results);
+  });
+};
+
+
