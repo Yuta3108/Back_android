@@ -101,7 +101,7 @@ app.use('/api/orders', ordersRoutes);
 //api chi tiết đơn hàng
 app.use('/api/order-details', orderDetailsRoutes);
 //api size sản phẩm
-app.use('/api/sizesanpham', sizeRoutes);
+app.use('/api/size', sizeRoutes);
 //  Chạy server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(` Server chạy trên cổng ${PORT}`));

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1:3306
--- Thời gian đã tạo: Th5 14, 2025 lúc 01:53 PM
+-- Thời gian đã tạo: Th5 15, 2025 lúc 02:42 PM
 -- Phiên bản máy phục vụ: 8.3.0
 -- Phiên bản PHP: 8.2.18
 
@@ -171,10 +171,69 @@ INSERT INTO `products` (`id`, `name`, `price`, `category_id`, `img`) VALUES
 (7, 'Trà sữa trân châu đường đen', 25000, 2, 'img/trasuatcdd.jpg'),
 (8, 'Trà sữa Atisô', 30000, 2, 'img/trasuaatiso.jpg'),
 (11, 'Sinh tố bơ', 25000, 3, 'img/stbo.jpg'),
-(13, 'Sinh tố dưa lưới', 25000, 3, 'img/stdualuoi.jpg'),
-(16, 'Bò húc', 13000, 4, 'img/bohuc.jpg'),
-(17, 'Nước suối', 10000, 4, 'img/nuocsuoi.jpg'),
-(20, 'Trà ôlong', 12000, 4, 'img/olong.jpg');
+(13, 'Sinh tố dưa lưới', 25000, 3, 'img/stdualuoi.jpg');
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `sizeproduct`
+--
+
+DROP TABLE IF EXISTS `sizeproduct`;
+CREATE TABLE IF NOT EXISTS `sizeproduct` (
+  `masizeproduct` int NOT NULL AUTO_INCREMENT,
+  `masize` int NOT NULL,
+  `masanpham` int NOT NULL,
+  PRIMARY KEY (`masizeproduct`),
+  KEY `masizesanpham` (`masize`,`masanpham`),
+  KEY `FK_masp` (`masanpham`)
+) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `sizeproduct`
+--
+
+INSERT INTO `sizeproduct` (`masizeproduct`, `masize`, `masanpham`) VALUES
+(1, 1, 1),
+(5, 1, 2),
+(9, 1, 3),
+(13, 1, 4),
+(17, 1, 5),
+(21, 1, 6),
+(25, 1, 7),
+(29, 1, 8),
+(33, 1, 11),
+(42, 1, 13),
+(2, 2, 1),
+(6, 2, 2),
+(10, 2, 3),
+(14, 2, 4),
+(18, 2, 5),
+(22, 2, 6),
+(26, 2, 7),
+(30, 2, 8),
+(34, 2, 11),
+(43, 2, 13),
+(3, 3, 1),
+(7, 3, 2),
+(11, 3, 3),
+(15, 3, 4),
+(19, 3, 5),
+(23, 3, 6),
+(27, 3, 7),
+(31, 3, 8),
+(35, 3, 11),
+(44, 3, 13),
+(4, 5, 1),
+(8, 5, 2),
+(12, 5, 3),
+(16, 5, 4),
+(20, 5, 5),
+(24, 5, 6),
+(28, 5, 7),
+(32, 5, 8),
+(36, 5, 11),
+(45, 5, 13);
 
 -- --------------------------------------------------------
 
@@ -186,47 +245,18 @@ DROP TABLE IF EXISTS `sizesanpham`;
 CREATE TABLE IF NOT EXISTS `sizesanpham` (
   `masize` int NOT NULL AUTO_INCREMENT,
   `size` varchar(10) NOT NULL,
-  `gia` float NOT NULL,
-  `masanpham` int NOT NULL,
-  PRIMARY KEY (`masize`),
-  KEY `masanpham` (`masanpham`)
-) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  PRIMARY KEY (`masize`)
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `sizesanpham`
 --
 
-INSERT INTO `sizesanpham` (`masize`, `size`, `gia`, `masanpham`) VALUES
-(1, 'S', 10000, 1),
-(2, 'M', 15000, 1),
-(3, 'L', 20000, 1),
-(4, 'S', 18000, 2),
-(5, 'M', 23000, 2),
-(6, 'L', 28000, 2),
-(7, 'S', 15000, 3),
-(8, 'M', 20000, 3),
-(9, 'L', 25000, 3),
-(10, 'S', 25000, 4),
-(11, 'M', 30000, 4),
-(12, 'L', 35000, 4),
-(13, 'S', 50000, 5),
-(14, 'M', 55000, 5),
-(15, 'L', 60000, 5),
-(16, 'S', 20000, 6),
-(17, 'M', 25000, 6),
-(18, 'L', 30000, 6),
-(19, 'S', 25000, 7),
-(20, 'M', 30000, 7),
-(21, 'L', 35000, 7),
-(22, 'S', 30000, 8),
-(23, 'M', 35000, 8),
-(24, 'L', 40000, 8),
-(25, 'S', 25000, 11),
-(26, 'M', 30000, 11),
-(27, 'L', 30000, 11),
-(28, 'S', 25000, 13),
-(29, 'M', 30000, 13),
-(30, 'L', 35000, 13);
+INSERT INTO `sizesanpham` (`masize`, `size`) VALUES
+(1, 'S'),
+(2, 'M'),
+(3, 'L'),
+(5, 'XL');
 
 -- --------------------------------------------------------
 
@@ -286,10 +316,11 @@ ALTER TABLE `products`
   ADD CONSTRAINT `FK_idc` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Các ràng buộc cho bảng `sizesanpham`
+-- Các ràng buộc cho bảng `sizeproduct`
 --
-ALTER TABLE `sizesanpham`
-  ADD CONSTRAINT `FK_Mspsize` FOREIGN KEY (`masanpham`) REFERENCES `products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `sizeproduct`
+  ADD CONSTRAINT `FK_masize` FOREIGN KEY (`masize`) REFERENCES `sizesanpham` (`masize`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `FK_masp` FOREIGN KEY (`masanpham`) REFERENCES `products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

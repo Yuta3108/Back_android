@@ -2,19 +2,20 @@ const express = require('express');
 const router = express.Router();
 const sizesanphamController = require('../controllers/sizesanphamController');
 
-// Route GET: Lấy toàn bộ size sản phẩm
-router.get('/', sizesanphamController.getAllSizes);
+
 
 // Thêm 1 size sản phẩm vào bảng mới
-router.post('/', sizesanphamController.createSize);
+router.post('/', sizesanphamController.createSizeProduct);
+
 
 //Xóa 1 size sản phẩm 
-router.delete('/:masize', sizesanphamController.deleteSize);
+router.delete('/:masizeproduct', sizesanphamController.deleteSizeProductById);
 
-//Sửa 1 size sản phẩm
-router.put('/:masize', sizesanphamController.updateSize);
+// Lấy size theo id sản phẩm
+router.get('/:masanpham', sizesanphamController.getSizeByProductId);
 
-// Lấy size theo mã sản phẩm
-router.get('/masanpham/:masanpham', sizesanphamController.getSizesByMaSanPham);
+// Cập nhật giá theo sản phẩm và size
+router.put('/update-price', sizesanphamController.updateGiaByProductAndSize);
+
 
 module.exports = router;
