@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1:3306
--- Thời gian đã tạo: Th5 15, 2025 lúc 02:42 PM
+-- Thời gian đã tạo: Th5 15, 2025 lúc 11:37 PM
 -- Phiên bản máy phục vụ: 8.3.0
 -- Phiên bản PHP: 8.2.18
 
@@ -139,6 +139,69 @@ INSERT INTO `employees` (`id`, `name`, `email`, `position`, `salary`, `created_a
 (3, 'Lê Văn C', 'c.le@example.com', 'Thu Ngân', 9000000, '2025-04-05 02:14:41'),
 (4, 'Phạm Thị D', 'd.pham@example.com', 'Thu Ngân', 7000000, '2025-04-05 02:14:41'),
 (9, 'Nguyễn Văn L', 'nguyenvana@gmail.com', 'Phục Vụ', 10000000, '2025-04-05 02:56:54');
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `giasize`
+--
+
+DROP TABLE IF EXISTS `giasize`;
+CREATE TABLE IF NOT EXISTS `giasize` (
+  `magiasize` int NOT NULL AUTO_INCREMENT,
+  `masanpham` int NOT NULL,
+  `masize` int NOT NULL,
+  `gia` float NOT NULL,
+  PRIMARY KEY (`magiasize`),
+  KEY `masanpham` (`masanpham`,`masize`),
+  KEY `FK_masize1` (`masize`)
+) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `giasize`
+--
+
+INSERT INTO `giasize` (`magiasize`, `masanpham`, `masize`, `gia`) VALUES
+(1, 1, 1, 10000),
+(2, 1, 2, 15000),
+(3, 1, 3, 20000),
+(4, 1, 5, 25000),
+(5, 2, 1, 13000),
+(6, 2, 2, 18000),
+(7, 2, 3, 23000),
+(8, 2, 5, 28000),
+(9, 3, 1, 18000),
+(10, 3, 2, 23000),
+(11, 3, 3, 28000),
+(12, 3, 5, 32000),
+(13, 4, 1, 25000),
+(14, 4, 2, 30000),
+(15, 4, 3, 35000),
+(16, 4, 5, 40000),
+(17, 5, 1, 17500),
+(18, 5, 2, 55000),
+(19, 5, 3, 60000),
+(20, 5, 5, 65000),
+(21, 6, 1, 20000),
+(22, 6, 2, 25000),
+(23, 6, 3, 30000),
+(24, 6, 5, 35000),
+(25, 7, 1, 25000),
+(26, 7, 2, 30000),
+(27, 7, 3, 35000),
+(28, 7, 5, 40000),
+(29, 8, 1, 30000),
+(30, 8, 2, 35000),
+(31, 8, 3, 40000),
+(32, 8, 5, 45000),
+(33, 11, 1, 25000),
+(34, 11, 2, 30000),
+(35, 11, 3, 35000),
+(36, 11, 5, 40000),
+(37, 13, 1, 25000),
+(38, 13, 2, 30000),
+(39, 13, 3, 35000),
+(40, 13, 5, 40000);
 
 -- --------------------------------------------------------
 
@@ -308,6 +371,13 @@ ALTER TABLE `chitietdonhang`
 --
 ALTER TABLE `chitietsanpham`
   ADD CONSTRAINT `FK_Msp` FOREIGN KEY (`masp`) REFERENCES `products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Các ràng buộc cho bảng `giasize`
+--
+ALTER TABLE `giasize`
+  ADD CONSTRAINT `FK_masize1` FOREIGN KEY (`masize`) REFERENCES `sizeproduct` (`masize`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `FK_msanpham1` FOREIGN KEY (`masanpham`) REFERENCES `sizeproduct` (`masanpham`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Các ràng buộc cho bảng `products`
