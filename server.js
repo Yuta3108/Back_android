@@ -13,7 +13,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// 📌 Kết nối MySQL
+//  Kết nối MySQL
 const db = mysql.createConnection({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
@@ -23,14 +23,14 @@ const db = mysql.createConnection({
 
 db.connect(err => {
     if (err) {
-        console.error("❌ Lỗi kết nối MySQL:", err);
+        console.error(" Lỗi kết nối MySQL:", err);
         process.exit(1);
     } else {
-        console.log("✅ Kết nối MySQL thành công!");
+        console.log(" Kết nối MySQL thành công!");
     }
 });
 
-// 📌 API Đăng ký tài khoản (Không mã hóa mật khẩu)
+//  API Đăng ký tài khoản (Không mã hóa mật khẩu)
 app.post("/register", (req, res) => {
     const { email, password } = req.body;
 
@@ -49,11 +49,11 @@ app.post("/register", (req, res) => {
         res.status(201).json({ msg: "Đăng ký thành công!" });
     });
 });
-app.use(express.json());  // ✅ Đảm bảo đọc được JSON
-app.use(express.urlencoded({ extended: true }));  // ✅ Đọc dữ liệu từ form
+app.use(express.json());  //  Đảm bảo đọc được JSON
+app.use(express.urlencoded({ extended: true }));  //  Đọc dữ liệu từ form
 
 
-// 📌 API Đăng nhập (Không kiểm tra mã hóa)
+//  API Đăng nhập (Không kiểm tra mã hóa)
 app.post("/api/login", (req, res) => {
     console.log("📥 Dữ liệu nhận được từ client:", req.body);
 
@@ -67,7 +67,7 @@ app.post("/api/login", (req, res) => {
 
     db.query(query, [email], (err, results) => {
         if (err) {
-            console.error("⚠️ Lỗi truy vấn MySQL:", err);
+            console.error(" Lỗi truy vấn MySQL:", err);
             return res.status(500).json({ error: "Lỗi server" });
         }
 
@@ -102,6 +102,6 @@ app.use('/api/orders', ordersRoutes);
 app.use('/api/order-details', orderDetailsRoutes);
 //api size sản phẩm
 app.use('/api/sizesanpham', sizeRoutes);
-// 📌 Chạy server
+//  Chạy server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server chạy trên cổng ${PORT}`));
+app.listen(PORT, () => console.log(` Server chạy trên cổng ${PORT}`));

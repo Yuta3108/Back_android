@@ -3,9 +3,9 @@ const db = require('../db');
 // Lấy tất cả size sản phẩm
 exports.getAllSizes = (req, res) => {
   const sql = 'SELECT * FROM sizesanpham';
-  db.query(sql, (err, results) => { // ✅ Sử dụng db chứ không phải connection
+  db.query(sql, (err, results) => {
     if (err) {
-      console.error('❌ Lỗi truy vấn:', err);
+      console.error(' Lỗi truy vấn:', err);
       return res.status(500).json({ error: 'Lỗi server' });
     }
     res.status(200).json(results);
@@ -23,7 +23,7 @@ exports.createSize = (req, res) => {
   const sql = 'INSERT INTO sizesanpham (size, gia, masanpham) VALUES (?, ?, ?)';
   db.query(sql, [size, gia, masanpham], (err, result) => {
     if (err) {
-      console.error('❌ Lỗi thêm size:', err);
+      console.error(' Lỗi thêm size:', err);
       return res.status(500).json({ error: 'Lỗi server khi thêm size sản phẩm' });
     }
     res.status(201).json({ message: 'Thêm size sản phẩm thành công!', insertedId: result.insertId });
@@ -37,7 +37,7 @@ exports.deleteSize = (req, res) => {
   const sql = 'DELETE FROM sizesanpham WHERE masize = ?';
   db.query(sql, [masize], (err, result) => {
     if (err) {
-      console.error('❌ Lỗi khi xoá size:', err);
+      console.error(' Lỗi khi xoá size:', err);
       return res.status(500).json({ error: 'Lỗi server khi xoá size sản phẩm' });
     }
 
@@ -61,7 +61,7 @@ exports.updateSize = (req, res) => {
   const sql = 'UPDATE sizesanpham SET size = ?, gia = ?, masanpham = ? WHERE masize = ?';
   db.query(sql, [size, gia, masanpham, masize], (err, result) => {
     if (err) {
-      console.error('❌ Lỗi khi cập nhật size:', err);
+      console.error(' Lỗi khi cập nhật size:', err);
       return res.status(500).json({ error: 'Lỗi server khi cập nhật size sản phẩm' });
     }
 

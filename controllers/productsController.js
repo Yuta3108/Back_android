@@ -65,7 +65,7 @@ exports.updateProduct = (req, res) => {
 
     db.query(sql, [name, price, category_id, img || null, productId], (err, result) => {
         if (err) {
-            console.error('❌ Lỗi cập nhật sản phẩm:', err);
+            console.error(' Lỗi cập nhật sản phẩm:', err);
             return res.status(500).json({ message: 'Lỗi server khi cập nhật sản phẩm' });
         }
 
@@ -73,7 +73,7 @@ exports.updateProduct = (req, res) => {
             return res.status(404).json({ message: 'Không tìm thấy sản phẩm để cập nhật' });
         }
 
-        res.json({ message: '✅ Cập nhật sản phẩm thành công!' });
+        res.json({ message: ' Cập nhật sản phẩm thành công!' });
     });
 };
 
