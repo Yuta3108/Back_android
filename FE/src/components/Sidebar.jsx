@@ -39,6 +39,7 @@ const menuItems = [
     { to: '/', label: '🏠 Trang chính' },
     { to: '/employees', label: '👥 Quản lý Nhân viên' },
     { to: '/products', label: '🛒 Quản lý Sản phẩm' },
+    { to: '/order-status', label: '📦 Quản lý Trạng thái Đơn hàng' },
 ];
 
 export default function Sidebar() {

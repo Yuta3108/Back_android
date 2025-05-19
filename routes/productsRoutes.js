@@ -12,6 +12,6 @@ router.post('/', productsController.addProduct);
 router.delete('/:id', productsController.deleteProduct);
 //update sản phẩm dựa theo id
 router.put('/:id', productsController.updateProduct);
-
-
+// ✅ Thêm API thống kê sản phẩm
+router.get('/stats', productsController.getProductStats);
 module.exports = router;

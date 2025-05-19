@@ -14,6 +14,7 @@ router.delete('/:id', ordersController.deleteOrder);
 // Cập nhật trạng thái đơn hàng
 router.put('/:id/status', ordersController.updateOrderStatus);
 
-
+// Route thống kê đơn hàng
+router.get('/stats', ordersController.getOrderStats);
 module.exports = router;
 

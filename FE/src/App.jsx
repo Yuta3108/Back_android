@@ -23,13 +23,14 @@
 //     </Router>
 //   );
 // }
+
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useState } from 'react';
 import Sidebar from './components/Sidebar';
 import Dashboard from './pages/Dashboard';
 import Employees from './pages/Employees';
 import Products from './pages/Products';
-
+import OrderStatus from './pages/OrderStatus';
 export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -42,9 +43,12 @@ export default function App() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/employees" element={<Employees />} />
             <Route path="/products" element={<Products />} />
+            <Route path="/order-status" element={<OrderStatus />} />
+
           </Routes>
         </div>
       </div>
     </Router>
   );
 }
+

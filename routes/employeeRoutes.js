@@ -14,5 +14,6 @@ router.put('/:id', employeeController.updateEmployee);
 // Xoá nhân viên theo ID
 router.delete('/:id', employeeController.deleteEmployee);
 
-
+//thống kê nhân viên
+router.get('/stats', employeeController.getEmployeeStats);
 module.exports = router;

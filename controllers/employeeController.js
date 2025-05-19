@@ -74,3 +74,28 @@ exports.deleteEmployee = (req, res) => {
     res.json({ message: 'Xoá nhân viên thành công' });
   });
 };
+
+
+// 📊 Thống kê đầy đủ thông tin nhân viên
+exports.getEmployeeStats = (req, res) => {
+  const sql = `
+    SELECT 
+      COUNT(*) AS total_employees,
+      SUM(salary) AS total_salary,
+      AVG(salary) AS average_salary,
+      MAX(salary) AS max_salary,
+      MIN(salary) AS min_salary
+    FROM employees
+  `;
+
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error("Lỗi khi thống kê nhân viên:", err.message);
+      return res.status(500).json({ message: 'Lỗi server khi thống kê nhân viên' });
+    }
+
+    res.status(200).json({
+      data: results[0], // vì chỉ có 1 dòng kết quả
+    });
+  });
+};

@@ -77,3 +77,45 @@ exports.updateProduct = (req, res) => {
     });
 };
 
+// 📊 Thống kê sản phẩm
+exports.getProductStats = (req, res) => {
+    const sql = `
+        SELECT 
+            COUNT(*) AS total_products,
+            SUM(price) AS total_price,
+            AVG(price) AS average_price,
+            MAX(price) AS max_price,
+            MIN(price) AS min_price
+        FROM products;
+    `;
+
+    const sqlByCategory = `
+        SELECT category_id, COUNT(*) AS count
+        FROM products
+        GROUP BY category_id;
+    `;
+
+    // Thực hiện 2 truy vấn song song
+    db.query(sql, (err1, statsResult) => {
+        if (err1) {
+            console.error("Lỗi thống kê sản phẩm:", err1.message);
+            return res.status(500).json({ message: 'Lỗi server khi thống kê sản phẩm' });
+        }
+
+        db.query(sqlByCategory, (err2, categoryCounts) => {
+            if (err2) {
+                console.error("Lỗi thống kê theo danh mục:", err2.message);
+                return res.status(500).json({ message: 'Lỗi server khi thống kê danh mục sản phẩm' });
+            }
+
+            res.status(200).json({
+                data: {
+                    ...statsResult[0], // Thống kê chung
+                    byCategory: categoryCounts // Thống kê theo danh mục
+                }
+            });
+        });
+    });
+};
+
+

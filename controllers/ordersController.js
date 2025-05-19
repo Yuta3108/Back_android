@@ -115,3 +115,58 @@ exports.deleteOrderDetail = (req, res) => {
         res.json({ message: 'Xóa chi tiết đơn hàng thành công' });
     });
 };
+
+// 📦 Thống kê đơn hàng
+exports.getOrderStats = (req, res) => {
+    const sqlGeneral = `
+        SELECT 
+            COUNT(*) AS total_orders,
+            SUM(tongtien) AS total_revenue,
+            AVG(tongtien) AS average_order_value,
+            MAX(tongtien) AS max_order_value,
+            MIN(tongtien) AS min_order_value
+        FROM donhang;
+    `;
+
+    const sqlByStatus = `
+        SELECT trangthai, COUNT(*) AS count
+        FROM donhang
+        GROUP BY trangthai;
+    `;
+
+    const sqlByPayment = `
+        SELECT phuongthucthanhtoan, COUNT(*) AS count
+        FROM donhang
+        GROUP BY phuongthucthanhtoan;
+    `;
+
+    db.query(sqlGeneral, (err1, generalStats) => {
+        if (err1) {
+            console.error('Lỗi khi thống kê đơn hàng:', err1);
+            return res.status(500).json({ message: 'Lỗi server khi thống kê đơn hàng' });
+        }
+
+        db.query(sqlByStatus, (err2, statusStats) => {
+            if (err2) {
+                console.error('Lỗi thống kê theo trạng thái:', err2);
+                return res.status(500).json({ message: 'Lỗi server khi thống kê trạng thái đơn hàng' });
+            }
+
+            db.query(sqlByPayment, (err3, paymentStats) => {
+                if (err3) {
+                    console.error('Lỗi thống kê phương thức thanh toán:', err3);
+                    return res.status(500).json({ message: 'Lỗi server khi thống kê phương thức thanh toán' });
+                }
+
+                res.status(200).json({
+                    data: {
+                        ...generalStats[0],
+                        byStatus: statusStats,
+                        byPayment: paymentStats
+                    }
+                });
+            });
+        });
+    });
+};
+
