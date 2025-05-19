@@ -35,9 +35,9 @@ export default function App() {
 
   return (
     <Router>
-      <div className="flex min-h-screen">
+      <div className="flex min-h-screen overflow-hidden">
         <Sidebar />
-        <div className="flex-1 bg-[#fdfaf6] p-4 md:ml-64 transition-all">
+        <div className="flex-1 bg-[#fdfaf6] p-4 md:ml-64 transition-all box-border">
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/employees" element={<Employees />} />

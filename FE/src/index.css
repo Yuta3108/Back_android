@@ -6,6 +6,9 @@ body {
   background-color: #fdfaf6;
   font-family: 'Inter', sans-serif;
   color: #4b2e2e;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 

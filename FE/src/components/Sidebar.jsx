@@ -57,8 +57,8 @@ export default function Sidebar() {
 
             {/* Sidebar */}
             <div
-                className={`fixed z-40 top-0 left-0 h-full w-64 bg-[#5c3d2e] text-white px-6 py-10 shadow-lg transform transition-transform duration-300
-                ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 md:static md:block`}
+                className={`fixed z-40 top-0 left-0 h-full w-64 bg-[#5c3d2e] text-white py-10 shadow-lg transform transition-transform duration-300
+  ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 md:static md:block`}
             >
                 <h1 className="text-4xl font-extrabold mb-10 text-[#fef3e7] tracking-wide text-center">
                     Cafe Admin
