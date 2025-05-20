@@ -50,7 +50,7 @@ export default function Sidebar() {
         <>
             {/* Nút toggle cho mobile */}
             <button
-                className="md:hidden fixed top-4 left-4 z-50 bg-[#5c3d2e] text-white p-2 rounded-lg"
+                className="md:hidden fixed top-4 left-4 z-50 bg-[#fdfaf6] text-white p-2 rounded-lg"
                 onClick={() => setIsOpen(!isOpen)}
             >
                 ☰

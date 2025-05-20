@@ -8,7 +8,7 @@ exports.getAllEmployees = (req, res) => {
       console.error("Lỗi truy vấn:", err);
       return res.status(500).json({ message: 'Lỗi server' });
     }
-    res.json(results);
+    res.json({ data: results }); // ✅ Trả về đúng cấu trúc { data: [...] }
   });
 };
 
