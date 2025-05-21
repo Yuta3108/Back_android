@@ -170,3 +170,66 @@ exports.getOrderStats = (req, res) => {
     });
 };
 
+//API lấy đơn hàng và chi tiết đơn hàng: 
+
+// Lấy danh sách đơn hàng theo mã user
+exports.getOrdersByUser = (req, res) => {
+    const { userId } = req.params;
+
+    const sql = `
+        SELECT 
+            dh.madonhang,
+            dh.ngaydat,
+            dh.tongtien,
+            dh.trangthai,
+            dh.ghichu,
+            dh.phuongthucthanhtoan,
+            dh.soluong,
+
+            u.name AS user_name,
+            u.phone AS user_phone,
+            u.address AS user_address,
+
+            p.name AS product_name,
+            p.price AS product_price
+
+        FROM donhang dh
+        JOIN users u ON dh.mauser = u.id
+        JOIN chitietdonhang ct ON dh.madonhang = ct.madonhang
+        JOIN products p ON ct.masanpham = p.id
+        WHERE u.id = ?
+    `;
+
+    db.query(sql, [userId], (err, results) => {
+        if (err) {
+            console.error('Lỗi khi lấy danh sách đơn hàng:', err);
+            return res.status(500).json({ message: 'Lỗi server khi lấy danh sách đơn hàng' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ message: 'Không có đơn hàng nào cho người dùng này' });
+        }
+
+        const orders = results.map(row => ({
+            madonhang: row.madonhang,
+            ngaydat: row.ngaydat,
+            tongtien: row.tongtien,
+            trangthai: row.trangthai,
+            ghichu: row.ghichu,
+            phuongthucthanhtoan: row.phuongthucthanhtoan,
+            soluong: row.soluong,
+            user: {
+                name: row.user_name,
+                phone: row.user_phone,
+                address: row.user_address
+            },
+            product: {
+                name: row.product_name,
+                price: row.product_price
+            }
+        }));
+
+        res.json(orders);
+    });
+};
+

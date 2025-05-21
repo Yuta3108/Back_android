@@ -16,5 +16,9 @@ router.put('/:id/status', ordersController.updateOrderStatus);
 
 // Route thống kê đơn hàng
 router.get('/stats', ordersController.getOrderStats);
+
+//Lấy đơn hàng và chi tiết đơn hàng
+router.get('/:userId', ordersController.getOrdersByUser);
+
 module.exports = router;
 
