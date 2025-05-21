@@ -32,22 +32,28 @@ db.connect(err => {
 
 //  API Đăng ký tài khoản (Không mã hóa mật khẩu)
 app.post("/register", (req, res) => {
-    const { email, password } = req.body;
+    const { email, password, name, phone, address } = req.body;
 
     // Kiểm tra đầu vào
-    if (!email || !password) {
-        return res.status(400).json({ msg: "Vui lòng nhập email và mật khẩu!" });
+    if (!email || !password || !name || !phone || !address) {
+        return res.status(400).json({ msg: "Vui lòng nhập đầy đủ thông tin!" });
     }
 
-    // Lưu vào MySQL (Không mã hóa)
-    const query = "INSERT INTO users (email, password) VALUES (?, ?)";
-    db.query(query, [email.toLowerCase(), password], (err, result) => {
-        if (err) {
-            console.error("⚠️ Lỗi đăng ký:", err);
-            return res.status(400).json({ msg: "Email đã tồn tại hoặc lỗi hệ thống!" });
+    const query = `
+        INSERT INTO users (email, password, name, phone, address)
+        VALUES (?, ?, ?, ?, ?)
+    `;
+    db.query(
+        query,
+        [email.toLowerCase(), password, name, phone, address],
+        (err, result) => {
+            if (err) {
+                console.error(" Lỗi đăng ký:", err);
+                return res.status(400).json({ msg: "Email đã tồn tại hoặc lỗi hệ thống!" });
+            }
+            res.status(201).json({ msg: "Đăng ký thành công!" });
         }
-        res.status(201).json({ msg: "Đăng ký thành công!" });
-    });
+    );
 });
 app.use(express.json());  //  Đảm bảo đọc được JSON
 app.use(express.urlencoded({ extended: true }));  //  Đọc dữ liệu từ form
