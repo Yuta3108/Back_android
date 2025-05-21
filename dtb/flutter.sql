@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1:3306
--- Thời gian đã tạo: Th5 15, 2025 lúc 11:37 PM
+-- Thời gian đã tạo: Th5 21, 2025 lúc 03:02 PM
 -- Phiên bản máy phục vụ: 8.3.0
 -- Phiên bản PHP: 8.2.18
 
@@ -60,15 +60,14 @@ CREATE TABLE IF NOT EXISTS `chitietdonhang` (
   PRIMARY KEY (`machitiet`),
   KEY `madonhang` (`madonhang`,`masanpham`),
   KEY `FK_msanpham` (`masanpham`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `chitietdonhang`
 --
 
 INSERT INTO `chitietdonhang` (`machitiet`, `madonhang`, `masanpham`, `tonggia`) VALUES
-(1, 1, 1, 10000),
-(5, 1, 2, 15000);
+(6, 4, 1, 20000);
 
 -- --------------------------------------------------------
 
@@ -101,15 +100,17 @@ CREATE TABLE IF NOT EXISTS `donhang` (
   `ghichu` text NOT NULL,
   `phuongthucthanhtoan` varchar(10) NOT NULL,
   `soluong` int NOT NULL,
-  PRIMARY KEY (`madonhang`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `mauser` int NOT NULL,
+  PRIMARY KEY (`madonhang`),
+  KEY `mauser` (`mauser`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `donhang`
 --
 
-INSERT INTO `donhang` (`madonhang`, `ngaydat`, `tongtien`, `trangthai`, `ghichu`, `phuongthucthanhtoan`, `soluong`) VALUES
-(1, '2025-05-14', 10000, 'dathanhcong', '', 'cod', 1);
+INSERT INTO `donhang` (`madonhang`, `ngaydat`, `tongtien`, `trangthai`, `ghichu`, `phuongthucthanhtoan`, `soluong`, `mauser`) VALUES
+(4, '2025-05-21', 20000, 'choxuly', 'ca phe den khong duong', 'cod', 1, 3);
 
 -- --------------------------------------------------------
 
@@ -127,18 +128,19 @@ CREATE TABLE IF NOT EXISTS `employees` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=MyISAM AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `employees`
 --
 
 INSERT INTO `employees` (`id`, `name`, `email`, `position`, `salary`, `created_at`) VALUES
-(1, 'Nguyễn Văn A', 'a.nguyen@example.com', 'Quản lý', 15000000, '2025-04-05 02:14:41'),
+(1, 'Nguyễn Văn B', 'a.nguyen@example.com', 'Quản lý', 15000000, '2025-04-05 02:14:41'),
 (2, 'Trần Thị B', 'b.tran@example.com', 'Thu ngân', 8000000, '2025-04-05 02:14:41'),
 (3, 'Lê Văn C', 'c.le@example.com', 'Thu Ngân', 9000000, '2025-04-05 02:14:41'),
 (4, 'Phạm Thị D', 'd.pham@example.com', 'Thu Ngân', 7000000, '2025-04-05 02:14:41'),
-(9, 'Nguyễn Văn L', 'nguyenvana@gmail.com', 'Phục Vụ', 10000000, '2025-04-05 02:56:54');
+(10, 'thanh sang', 'st857146@gmail.com', 'Quản lý', 5000000, '2025-05-20 12:36:01'),
+(11, 'anh vien', 'anhvien1223@gmail.com', 'Làm mình làm mẩy', 100000, '2025-05-20 12:47:00');
 
 -- --------------------------------------------------------
 
@@ -164,11 +166,11 @@ CREATE TABLE IF NOT EXISTS `giasize` (
 INSERT INTO `giasize` (`magiasize`, `masanpham`, `masize`, `gia`) VALUES
 (1, 1, 1, 10000),
 (2, 1, 2, 15000),
-(3, 1, 3, 20000),
-(4, 1, 5, 25000),
+(3, 1, 3, 25000),
+(4, 1, 5, 30000),
 (5, 2, 1, 13000),
 (6, 2, 2, 18000),
-(7, 2, 3, 23000),
+(7, 2, 3, 17500),
 (8, 2, 5, 28000),
 (9, 3, 1, 18000),
 (10, 3, 2, 23000),
@@ -332,28 +334,19 @@ CREATE TABLE IF NOT EXISTS `users` (
   `id` int NOT NULL AUTO_INCREMENT,
   `email` varchar(25) NOT NULL,
   `password` varchar(25) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `email` (`email`)
-) ENGINE=MyISAM AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `name` varchar(250) NOT NULL,
+  `phone` varchar(15) NOT NULL,
+  `address` varchar(250) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `users`
 --
 
-INSERT INTO `users` (`id`, `email`, `password`) VALUES
-(1, 'admin@gmail.com', '123456'),
-(2, 'nguyenvana@example.com', 'password123'),
-(3, 'tranthib@example.com', '12345678'),
-(4, 'levanc@example.com', 'admin123'),
-(5, 'phamthid@example.com', 'qwerty'),
-(6, 'hoangvane@example.com', 'letmein'),
-(7, 'test@example.com', '123456'),
-(8, 'toysignupscreen@gmail.com', '123456'),
-(9, 'toyotran@gmail.com', '123456'),
-(10, 'toyotran12@gmail.com', '123456'),
-(11, 'toyotran32@gmail.com', '123456'),
-(12, 'toyotran44@gmail.com', '123456'),
-(13, 'san@gmail.com', '123456');
+INSERT INTO `users` (`id`, `email`, `password`, `name`, `phone`, `address`) VALUES
+(3, 'san@gmail.com', '123', 'thanh san', '01234567899', '123 bong sao'),
+(4, '6@gmail.com', '123', 'chu 6', '1234567897', '123 cau chu y');
 
 --
 -- Các ràng buộc cho các bảng đã đổ
@@ -363,7 +356,7 @@ INSERT INTO `users` (`id`, `email`, `password`) VALUES
 -- Các ràng buộc cho bảng `chitietdonhang`
 --
 ALTER TABLE `chitietdonhang`
-  ADD CONSTRAINT `FK_mdonhang` FOREIGN KEY (`madonhang`) REFERENCES `donhang` (`madonhang`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `FK_mdh` FOREIGN KEY (`madonhang`) REFERENCES `donhang` (`madonhang`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `FK_msanpham` FOREIGN KEY (`masanpham`) REFERENCES `products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
@@ -371,6 +364,12 @@ ALTER TABLE `chitietdonhang`
 --
 ALTER TABLE `chitietsanpham`
   ADD CONSTRAINT `FK_Msp` FOREIGN KEY (`masp`) REFERENCES `products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Các ràng buộc cho bảng `donhang`
+--
+ALTER TABLE `donhang`
+  ADD CONSTRAINT `FK_Mauser` FOREIGN KEY (`mauser`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Các ràng buộc cho bảng `giasize`
