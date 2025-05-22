@@ -27,3 +27,36 @@ exports.updateUser = (req, res) => {
         res.json({ message: 'Cập nhật khách hàng thành công' });
     });
 };
+
+// Lấy danh sách khách hàng
+exports.getAllUsers = (req, res) => {
+    const sql = 'SELECT * FROM users';
+
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error("Lỗi khi truy vấn danh sách khách hàng:", err);
+            return res.status(500).json({ message: 'Lỗi server khi lấy danh sách khách hàng' });
+        }
+
+        res.json({ users: results });
+    });
+};
+
+// Xoá khách hàng
+exports.deleteUser = (req, res) => {
+    const { id } = req.params;
+
+    const sql = 'DELETE FROM users WHERE id = ?';
+    db.query(sql, [id], (err, result) => {
+        if (err) {
+            console.error("Lỗi khi xoá khách hàng:", err);
+            return res.status(500).json({ message: 'Lỗi server khi xoá khách hàng' });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Không tìm thấy khách hàng để xoá' });
+        }
+
+        res.json({ message: 'Xoá khách hàng thành công' });
+    });
+};
