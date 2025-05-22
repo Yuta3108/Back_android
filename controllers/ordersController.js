@@ -66,10 +66,11 @@ exports.updateOrderStatus = (req, res) => {
         return res.status(400).json({ message: 'Vui lòng cung cấp trạng thái mới' });
     }
 
-    const sqlSelect = 'SELECT trangthai FROM donhang WHERE madonhang = ?';
-    db.query(sqlSelect, [id], (err, results) => {
+    const sqlGetCurrentStatus = 'SELECT trangthai FROM donhang WHERE madonhang = ?';
+
+    db.query(sqlGetCurrentStatus, [id], (err, results) => {
         if (err) {
-            console.error('Lỗi khi truy vấn đơn hàng:', err);
+            console.error('Lỗi khi truy vấn trạng thái hiện tại:', err);
             return res.status(500).json({ message: 'Lỗi server khi truy vấn đơn hàng' });
         }
 
@@ -79,23 +80,32 @@ exports.updateOrderStatus = (req, res) => {
 
         const currentStatus = results[0].trangthai;
 
-        // Kiểm tra điều kiện không cho quay lại "choxuly"
-        if (currentStatus === 'dathanhcong' && trangthai === 'choxuly') {
-            return res.status(400).json({ message: 'Không thể sửa trạng thái về "chờ xử lý" nếu đơn hàng đã thành công' });
+        // Nếu trạng thái hiện tại là "dathanhcong" thì không cho phép cập nhật nữa
+        if (currentStatus === 'dathanhcong') {
+            return res.status(400).json({
+                message: 'Đơn hàng đã được giao thành công, không thể thay đổi trạng thái nữa'
+            });
         }
 
-        // Cập nhật trạng thái
-        const sqlUpdate = 'UPDATE donhang SET trangthai = ? WHERE madonhang = ?';
-        db.query(sqlUpdate, [trangthai, id], (err) => {
+        // Nếu không thay đổi gì thì không cần update
+        if (currentStatus === trangthai) {
+            return res.status(200).json({ message: 'Trạng thái không thay đổi' });
+        }
+
+        // Thực hiện cập nhật trạng thái
+        const sqlUpdateStatus = 'UPDATE donhang SET trangthai = ? WHERE madonhang = ?';
+        db.query(sqlUpdateStatus, [trangthai, id], (err) => {
             if (err) {
                 console.error('Lỗi khi cập nhật trạng thái:', err);
-                return res.status(500).json({ message: 'Lỗi server khi cập nhật trạng thái đơn hàng' });
+                return res.status(500).json({ message: 'Lỗi server khi cập nhật trạng thái' });
             }
 
             res.json({ message: 'Cập nhật trạng thái thành công' });
         });
     });
 };
+
+
 
 // Xóa chi tiết đơn hàng theo machitiet
 exports.deleteOrderDetail = (req, res) => {
@@ -185,14 +195,8 @@ exports.getOrdersByUser = (req, res) => {
             dh.ghichu,
             dh.phuongthucthanhtoan,
             dh.soluong,
-
             u.name AS user_name,
-            u.phone AS user_phone,
-            u.address AS user_address,
-
-            p.name AS product_name,
-            p.price AS product_price
-
+            p.name AS product_name
         FROM donhang dh
         JOIN users u ON dh.mauser = u.id
         JOIN chitietdonhang ct ON dh.madonhang = ct.madonhang
@@ -218,15 +222,8 @@ exports.getOrdersByUser = (req, res) => {
             ghichu: row.ghichu,
             phuongthucthanhtoan: row.phuongthucthanhtoan,
             soluong: row.soluong,
-            user: {
-                name: row.user_name,
-                phone: row.user_phone,
-                address: row.user_address
-            },
-            product: {
-                name: row.product_name,
-                price: row.product_price
-            }
+            user_name: row.user_name,
+            product_name: row.product_name
         }));
 
         res.json(orders);
