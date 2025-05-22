@@ -60,3 +60,19 @@ exports.deleteUser = (req, res) => {
         res.json({ message: 'Xoá khách hàng thành công' });
     });
 };
+
+// Thống kê khách hàng
+exports.getCustomerStats = (req, res) => {
+    const sql = 'SELECT COUNT(*) AS total_user FROM users';
+
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error("Lỗi khi thống kê khách hàng:", err);
+            return res.status(500).json({ message: 'Lỗi server khi thống kê khách hàng' });
+        }
+
+        const total = results[0].total_user;
+        res.json({ total_user: total });
+    });
+};
+
