@@ -9,6 +9,7 @@ const categoryRoutes = require('./routes/categoriesRoutes');
 const ordersRoutes = require('./routes/ordersRoutes');
 const orderDetailsRoutes = require('./routes/orderDetailsRoutes');
 const sizeRoutes = require('./routes/sizesanphamRoutes');
+const usersRoutes = require('./routes/usersRoutes');
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -108,6 +109,8 @@ app.use('/api/orders', ordersRoutes);
 app.use('/api/order-details', orderDetailsRoutes);
 //api size sản phẩm
 app.use('/api/size', sizeRoutes);
+//api của users
+app.use('/api', usersRoutes);
 //  Chạy server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(` Server chạy trên cổng ${PORT}`));
