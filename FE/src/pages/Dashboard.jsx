@@ -5,6 +5,7 @@ export default function Dashboard() {
     const [employeeStats, setEmployeeStats] = useState(null);
     const [productStats, setProductStats] = useState(null);
     const [orderStats, setOrderStats] = useState(null);
+    const [userStats, setUserStats] = useState(null); // ✅ THÊM DÒNG NÀY
     useEffect(() => {
         //Thống kê nhân viên
         axios.get('http://localhost:5000/api/employees/stats')
@@ -18,6 +19,10 @@ export default function Dashboard() {
         axios.get('http://localhost:5000/api/orders/stats')
             .then(res => setOrderStats(res.data.data))
             .catch(err => console.error('Lỗi khi lấy thống kê đơn hàng:', err));
+        // Thống kê khách hàng
+        axios.get('http://localhost:5000/api/users/stats')
+            .then(res => setUserStats(res.data)) // Không cần .data.data
+            .catch(err => console.error('Lỗi khi lấy thống kê khách hàng:', err));
     }, []);
 
 
@@ -28,7 +33,7 @@ export default function Dashboard() {
                 <h1 className="text-5xl font-bold mb-3 flex items-center gap-4">
                     <span className="text-5xl">☕</span>
                     Cafe Admin
-                    <span className="text-3xl text-[#a1866f] font-medium">Tổng quan</span>
+                    <span className="text-3xl text-[#a1866f] font-medium">Thống kê</span>
                 </h1>
                 <p className="text-lg text-[#6e5345]">Chào mừng đến với hệ thống quản lý quán cà phê!</p>
             </div>
@@ -104,6 +109,20 @@ export default function Dashboard() {
                         <p className="text-[#7b5e57] text-center text-lg">Đang tải thống kê...</p>
                     )}
                 </div>
+                {/* Box 4: Khách hàng */}
+                <div className="bg-white p-8 rounded-2xl shadow-md border border-[#e9ded6] hover:shadow-lg transition duration-200">
+                    <h2 className="text-2xl font-semibold mb-3 flex items-center justify-center gap-3">
+                        <span className="text-2xl">🙍‍♂️</span> Khách hàng
+                    </h2>
+                    {userStats ? (
+                        <div className="text-[#7b5e57] text-center text-lg">
+                            <p>Tổng số khách hàng: <strong>{userStats.total_user}</strong></p>
+                        </div>
+                    ) : (
+                        <p className="text-[#7b5e57] text-center text-lg">Đang tải thống kê...</p>
+                    )}
+                </div>
+
             </div>
         </div>
     );

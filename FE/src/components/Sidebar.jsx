@@ -40,6 +40,7 @@ const menuItems = [
     { to: '/employees', label: '👥 Quản lý Nhân viên' },
     { to: '/products', label: '🛒 Quản lý Sản phẩm' },
     { to: '/order-status', label: '📦 Quản lý Trạng thái Đơn hàng' },
+    { to: '/users', label: '👥 Quản lý Khách hàng' },
 ];
 
 export default function Sidebar() {
