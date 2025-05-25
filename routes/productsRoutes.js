@@ -14,4 +14,6 @@ router.delete('/:id', productsController.deleteProduct);
 router.put('/:id', productsController.updateProduct);
 // ✅ Thêm API thống kê sản phẩm
 router.get('/stats', productsController.getProductStats);
+//1 API lấy tất cả sản phẩm dựa theo thuộc tính( mã, tên, tên loại, tên size, giá theo size)
+router.get('/products-with-sizes', productsController.getProductListWithSizes);
 module.exports = router;

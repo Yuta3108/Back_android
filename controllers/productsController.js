@@ -117,5 +117,40 @@ exports.getProductStats = (req, res) => {
         });
     });
 };
+// API lấy tất cả của product (mã, tên sản phẩm, tên loại, tên size, giá theo size)
+exports.getProductListWithSizes = (req, res) => {
+    const sql = `
+        SELECT 
+            p.id AS product_id,
+            p.name AS product_name,
+            p.img AS image,
+            c.name AS category_name,
+            s.size AS size_name,
+            gs.gia AS price
+        FROM 
+            products p
+        JOIN 
+            categories c ON p.category_id = c.id
+        JOIN 
+            sizeproduct msp ON p.id = msp.masanpham
+        JOIN 
+            sizesanpham s ON msp.masize = s.masize
+        JOIN 
+            giasize gs ON p.id = gs.masanpham AND s.masize = gs.masize
+        ORDER BY 
+            p.id, s.masize;
+    `;
 
+    db.query(sql, (err, result) => {
+        if (err) {
+            console.error("Lỗi khi truy vấn sản phẩm có size:", err.message);
+            return res.status(500).json({ message: 'Lỗi server khi lấy danh sách sản phẩm' });
+        }
+
+        res.status(200).json({
+            message: "Lấy danh sách sản phẩm kèm size thành công",
+            data: result
+        });
+    });
+};
 

@@ -1,27 +1,68 @@
+import { useEffect, useState } from "react";
+import axios from "axios";
+
 export default function Products() {
-    const products = [
-        { id: 1, name: "Cà phê sữa", category: "Đồ uống", price: "25.000 ₫", createdAt: "09:00:00 5/5/2025" },
-        { id: 2, name: "Trà đào", category: "Đồ uống", price: "30.000 ₫", createdAt: "09:15:00 5/5/2025" },
-        { id: 3, name: "Bánh mì", category: "Thức ăn", price: "15.000 ₫", createdAt: "09:30:00 5/5/2025" },
-        { id: 4, name: "Bánh ngọt", category: "Thức ăn", price: "20.000 ₫", createdAt: "10:00:00 5/5/2025" },
-    ];
+    const [products, setProducts] = useState([]);
+
+    useEffect(() => {
+        axios.get("http://localhost:5000/api/products/products-with-sizes")
+            .then(res => {
+                const grouped = res.data.data.reduce((acc, item) => {
+                    const existing = acc.find(p => p.id === item.product_id);
+                    const sizeData = {
+                        size: item.size_name,
+                        price: item.price
+                    };
+
+                    if (existing) {
+                        existing.sizes.push(sizeData);
+                    } else {
+                        acc.push({
+                            id: item.product_id,
+                            name: item.product_name,
+                            category: item.category_name,
+                            image: item.image,
+                            sizes: [sizeData],
+                            createdAt: new Date().toLocaleString() // giả lập
+                        });
+                    }
+
+                    return acc;
+                }, []);
+
+                setProducts(grouped);
+            })
+            .catch(err => {
+                console.error("Lỗi khi gọi API:", err);
+            });
+    }, []);
 
     return (
         <div className="p-6 bg-[#fdfaf6] min-h-screen text-[#4b2e2e] flex flex-col items-center text-center">
             <h2 className="text-2xl font-bold mb-4">🛒 Quản lý Sản phẩm</h2>
-            <button
-                onClick
-                className="bg-[#7a5b4a] hover:bg-[#5d4034] text-[#fdfaf6] font-medium py-2 px-4 rounded-lg transition"
-            >
-                ➕ Thêm sản phẩm
-            </button>
-            <table className="table-auto border-collapse w-full max-w-5xl text-left">
+            <div className="flex gap-4 mb-4">
+                <button
+                    onClick={() => alert("Chức năng thêm sản phẩm đang phát triển")}
+                    className="bg-[#7a5b4a] hover:bg-[#5d4034] text-[#fdfaf6] font-medium py-2 px-4 rounded-lg transition"
+                >
+                    ➕ Thêm sản phẩm
+                </button>
+                <button
+                    onClick={() => alert("Chức năng thêm size đang phát triển")}
+                    className="bg-[#7a5b4a] hover:bg-[#5d4034] text-[#fdfaf6] font-medium py-2 px-4 rounded-lg transition"
+                >
+                    ➕ Thêm size
+                </button>
+            </div>
+
+
+            <table className="table-auto border-collapse w-full max-w-5xl text-left mt-6">
                 <thead>
                     <tr className="bg-[#8b6b5c] text-[#fdfaf6]">
                         <th className="border px-4 py-2">ID</th>
                         <th className="border px-4 py-2">Tên sản phẩm</th>
                         <th className="border px-4 py-2">Phân loại</th>
-                        <th className="border px-4 py-2">Giá</th>
+                        <th className="border px-4 py-2">Giá theo size</th>
                         <th className="border px-4 py-2">Ngày tạo</th>
                         <th className="border px-4 py-2">Hành động</th>
                     </tr>
@@ -29,10 +70,16 @@ export default function Products() {
                 <tbody>
                     {products.map((product) => (
                         <tr key={product.id} className="hover:bg-[#f0e8df]">
-                            <td className="border px-4 py-2">{product.id}</td>
-                            <td className="border px-4 py-2">{product.name}</td>
+                            <td className="border px-4 py-2 text-white">{product.id}</td>
+                            <td className="border px-4 py-2 text-white">{product.name}</td>
                             <td className="border px-4 py-2">{product.category}</td>
-                            <td className="border px-4 py-2">{product.price}</td>
+                            <td className="border px-4 py-2">
+                                {product.sizes.map((size, index) => (
+                                    <div key={index}>
+                                        <span className="font-semibold">{size.size}:</span> {Number(size.price).toLocaleString()} ₫
+                                    </div>
+                                ))}
+                            </td>
                             <td className="border px-4 py-2">{product.createdAt}</td>
                             <td className="border px-4 py-2">
                                 <button className="mr-2 px-2 py-1 bg-[#c2a28b] rounded hover:bg-[#b3907c]">Sửa</button>
