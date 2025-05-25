@@ -288,13 +288,13 @@ export default function Employees() {
                                     <td className="px-4 py-3 border-b space-x-2">
                                         <button
                                             onClick={() => handleEdit(e.id)}
-                                            className="px-3 py-1 rounded bg-yellow-500 text-white hover:bg-yellow-600 transition"
+                                            className="mr-2 px-2 py-1 bg-[#c2a28b] rounded hover:bg-[#b3907c]"
                                         >
                                             Sửa
                                         </button>
                                         <button
                                             onClick={() => handleDelete(e.id)}
-                                            className="px-3 py-1 rounded bg-red-500 text-white hover:bg-red-600 transition"
+                                            className="px-2 py-1 bg-[#d4795b] text-white rounded hover:bg-[#bd644a]"
                                         >
                                             Xóa
                                         </button>

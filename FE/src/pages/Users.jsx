@@ -62,7 +62,7 @@ const User = () => {
                                 <td className="p-2">{cus.address}</td>
                                 <td className="p-2">
                                     <button
-                                        className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+                                        className="px-2 py-1 bg-[#d4795b] text-white rounded hover:bg-[#bd644a]"
                                         onClick={() => handleDelete(cus.id)} // ✅ Gắn hàm xóa
                                     >
                                         Xóa
