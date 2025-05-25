@@ -93,10 +93,10 @@ app.post("/api/login", (req, res) => {
             process.env.JWT_SECRET,
             { expiresIn: "1h" }
         );
-       
-        res.json({ message: "Đăng nhập thành công!", token ,userId: user.id});
+
+        res.json({ message: "Đăng nhập thành công!", token, userId: user.id });
     });
-    
+
 });
 //api nhân viên
 app.use('/api/employees', employeeRoutes);

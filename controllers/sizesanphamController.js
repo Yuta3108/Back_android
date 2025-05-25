@@ -1,27 +1,6 @@
 const db = require('../db');
 
 
-
-// Thêm một size sản phẩm mới
-exports.createSizeProduct = (req, res) => {
-  const { masize, masanpham } = req.body;
-
-  if (!masize || !masanpham) {
-    return res.status(400).json({ error: 'Vui lòng cung cấp masize, masanpham ' });
-  }
-
-  const sql = 'INSERT INTO sizeproduct (masize, masanpham) VALUES (?, ?)';
-
-  db.query(sql, [masize, masanpham], (err, result) => {
-    if (err) {
-      console.error('Lỗi khi thêm size sản phẩm:', err);
-      return res.status(500).json({ error: 'Lỗi server khi thêm size sản phẩm' });
-    }
-
-    res.status(201).json({ message: 'Thêm size sản phẩm thành công!', insertId: result.insertId });
-  });
-};
-
 // Xoá một dòng trong bảng sizeproduct theo masizeproduct
 exports.deleteSizeProductById = (req, res) => {
   const { masizeproduct } = req.params;
@@ -41,7 +20,6 @@ exports.deleteSizeProductById = (req, res) => {
     res.status(200).json({ message: 'Xoá size sản phẩm thành công!' });
   });
 };
-
 
 
 // Lấy size và giá dựa theo mã sản phẩm
@@ -96,7 +74,100 @@ exports.updateGiaByProductAndSize = (req, res) => {
     res.status(200).json({ message: "Cập nhật giá thành công" });
   });
 };
+//API lấy danh sách size sản phẩm 
+exports.getAllSizes = (req, res) => {
+  const sql = `SELECT masize, size FROM sizesanpham ORDER BY masize`;
 
+  db.query(sql, (err, result) => {
+    if (err) {
+      console.error("Lỗi khi lấy danh sách size:", err.message);
+      return res.status(500).json({ message: 'Lỗi server khi lấy danh sách size' });
+    }
+
+    res.status(200).json({
+      message: "Lấy danh sách size thành công",
+      data: result
+    });
+  });
+};
+// Thêm size sản phẩm
+exports.addSize = (req, res) => {
+  const { size } = req.body;
+
+  // Kiểm tra dữ liệu đầu vào
+  if (!size || size.trim() === "") {
+    return res.status(400).json({ message: "Tên size không được để trống" });
+  }
+
+  const sql = `INSERT INTO sizesanpham (size) VALUES (?)`;
+
+  db.query(sql, [size.trim()], (err, result) => {
+    if (err) {
+      console.error("Lỗi khi thêm size:", err.message);
+      return res.status(500).json({ message: "Lỗi server khi thêm size" });
+    }
+
+    res.status(201).json({
+      message: "Thêm size thành công",
+      data: {
+        masize: result.insertId,
+        size: size.trim()
+      }
+    });
+  });
+};
+// Sửa size sản phẩm
+exports.updateSize = (req, res) => {
+  const { masize } = req.params;
+  const { size } = req.body;
+
+  if (!size || size.trim() === "") {
+    return res.status(400).json({ message: "Tên size không được để trống" });
+  }
+
+  const sql = `UPDATE sizesanpham SET size = ? WHERE masize = ?`;
+
+  db.query(sql, [size.trim(), masize], (err, result) => {
+    if (err) {
+      console.error("Lỗi khi cập nhật size:", err.message);
+      return res.status(500).json({ message: "Lỗi server khi cập nhật size" });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Không tìm thấy size cần cập nhật" });
+    }
+
+    res.status(200).json({
+      message: "Cập nhật size thành công",
+      data: {
+        masize,
+        size: size.trim()
+      }
+    });
+  });
+};
+// Xóa size sản phẩm
+exports.deleteSize = (req, res) => {
+  const { masize } = req.params;
+
+  const sql = `DELETE FROM sizesanpham WHERE masize = ?`;
+
+  db.query(sql, [masize], (err, result) => {
+    if (err) {
+      console.error("Lỗi khi xoá size:", err.message);
+      return res.status(500).json({ message: "Lỗi server khi xoá size" });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Không tìm thấy size để xoá" });
+    }
+
+    res.status(200).json({
+      message: "Xoá size thành công",
+      deletedMasize: masize
+    });
+  });
+};
 
 
 
