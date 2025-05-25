@@ -2,24 +2,24 @@ const db = require('../db');
 
 
 // Xoá một dòng trong bảng sizeproduct theo masizeproduct
-exports.deleteSizeProductById = (req, res) => {
-  const { masizeproduct } = req.params;
+// exports.deleteSizeProductById = (req, res) => {
+//   const { masizeproduct } = req.params;
 
-  const sql = 'DELETE FROM sizeproduct WHERE masizeproduct = ?';
+//   const sql = 'DELETE FROM sizeproduct WHERE masizeproduct = ?';
 
-  db.query(sql, [masizeproduct], (err, result) => {
-    if (err) {
-      console.error('Lỗi khi xoá size sản phẩm theo masizeproduct:', err);
-      return res.status(500).json({ error: 'Lỗi server khi xoá size sản phẩm' });
-    }
+//   db.query(sql, [masizeproduct], (err, result) => {
+//     if (err) {
+//       console.error('Lỗi khi xoá size sản phẩm theo masizeproduct:', err);
+//       return res.status(500).json({ error: 'Lỗi server khi xoá size sản phẩm' });
+//     }
 
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ message: 'Không tìm thấy size sản phẩm với masizeproduct này' });
-    }
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ message: 'Không tìm thấy size sản phẩm với masizeproduct này' });
+//     }
 
-    res.status(200).json({ message: 'Xoá size sản phẩm thành công!' });
-  });
-};
+//     res.status(200).json({ message: 'Xoá size sản phẩm thành công!' });
+//   });
+// };
 
 
 // Lấy size và giá dựa theo mã sản phẩm
@@ -146,30 +146,55 @@ exports.updateSize = (req, res) => {
     });
   });
 };
-// Xóa size sản phẩm
+//Xóa 1 size sản phẩm trong bảng sizesanpham có kiểm tra điều kiện, nếu đang sử dụng size đó thì không được xóa
 exports.deleteSize = (req, res) => {
   const { masize } = req.params;
 
-  const sql = `DELETE FROM sizesanpham WHERE masize = ?`;
-
-  db.query(sql, [masize], (err, result) => {
-    if (err) {
-      console.error("Lỗi khi xoá size:", err.message);
-      return res.status(500).json({ message: "Lỗi server khi xoá size" });
+  // Kiểm tra size có đang được dùng trong bảng giasize không
+  const checkGiaSizeSql = `SELECT COUNT(*) AS count FROM giasize WHERE masize = ?`;
+  db.query(checkGiaSizeSql, [masize], (errGia, resultGia) => {
+    if (errGia) {
+      console.error("Lỗi kiểm tra giasize:", errGia.message);
+      return res.status(500).json({ message: "Lỗi kiểm tra giasize" });
     }
 
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "Không tìm thấy size để xoá" });
+    if (resultGia[0].count > 0) {
+      return res.status(400).json({
+        message: "Không thể xoá size vì đang được dùng trong bảng giá sản phẩm"
+      });
     }
 
-    res.status(200).json({
-      message: "Xoá size thành công",
-      deletedMasize: masize
+    // (Tùy hệ thống, nếu sizeproduct cũng quan trọng thì giữ lại)
+    const checkSizeProductSql = `SELECT COUNT(*) AS count FROM sizeproduct WHERE masize = ?`;
+    db.query(checkSizeProductSql, [masize], (errSP, resultSP) => {
+      if (errSP) {
+        console.error("Lỗi kiểm tra sizeproduct:", errSP.message);
+        return res.status(500).json({ message: "Lỗi kiểm tra sizeproduct" });
+      }
+
+      if (resultSP[0].count > 0) {
+        return res.status(400).json({
+          message: "Không thể xoá size vì đang được dùng trong bảng sizeproduct"
+        });
+      }
+
+      // Nếu không bị ràng buộc ở đâu → xoá size
+      const deleteSql = `DELETE FROM sizesanpham WHERE masize = ?`;
+      db.query(deleteSql, [masize], (errDel, resultDel) => {
+        if (errDel) {
+          console.error("Lỗi khi xoá size:", errDel.message);
+          return res.status(500).json({ message: "Lỗi khi xoá size" });
+        }
+
+        if (resultDel.affectedRows === 0) {
+          return res.status(404).json({ message: "Không tìm thấy size để xoá" });
+        }
+
+        res.status(200).json({
+          message: "Xoá size thành công!",
+          masize
+        });
+      });
     });
   });
 };
-
-
-
-
-

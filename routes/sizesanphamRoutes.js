@@ -7,7 +7,7 @@ const sizesanphamController = require('../controllers/sizesanphamController');
 
 
 //Xóa 1 size sản phẩm 
-router.delete('/:masizeproduct', sizesanphamController.deleteSizeProductById);
+// router.delete('/:masizeproduct', sizesanphamController.deleteSizeProductById);
 
 
 // Cập nhật giá theo sản phẩm và size
