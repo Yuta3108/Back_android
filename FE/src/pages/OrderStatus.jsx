@@ -92,7 +92,7 @@ export default function OrderStatus() {
                                 <td className="px-4 py-2">
                                     <button
                                         onClick={() => handleEdit(order)}
-                                        className="text-[#a37c5d] hover:underline font-semibold"
+                                        className="mr-2 px-2 py-1 bg-[#c2a28b] rounded hover:bg-[#b3907c]"
                                     >
                                         Sửa
                                     </button>
