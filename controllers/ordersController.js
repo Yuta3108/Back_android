@@ -14,19 +14,24 @@ exports.getAllOrders = (req, res) => {
 
 // Thêm một đơn hàng mới
 exports.createOrder = (req, res) => {
-    const { tongtien, ghichu, phuongthucthanhtoan, soluong } = req.body;
-    const ngaydat = new Date().toISOString().slice(0, 10); // yyyy-mm-dd
+    const { tongtien, ghichu, phuongthucthanhtoan, soluong, mauser } = req.body;
+    const ngaydat = new Date().toISOString().slice(0, 10);
     const trangthai = 'choxuly';
 
-    if (!tongtien || !phuongthucthanhtoan || !soluong) {
-        return res.status(400).json({ message: 'Vui lòng nhập đầy đủ thông tin bắt buộc' });
+    console.log("Nhận request:", req.body); // 👈 In xem có vào đây không
+
+    if (!tongtien || !phuongthucthanhtoan || !soluong || !mauser) {
+        console.log("Thiếu dữ liệu");
+        return res.status(400).json({ message: 'Thiếu dữ liệu bắt buộc' });
     }
 
     const sql = `
-        INSERT INTO donhang (ngaydat, tongtien, trangthai, ghichu, phuongthucthanhtoan, soluong)
-        VALUES (?, ?, ?, ?, ?, ?)
+        INSERT INTO donhang (ngaydat, tongtien, trangthai, ghichu, phuongthucthanhtoan, soluong, mauser)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
-    const values = [ngaydat, tongtien, trangthai, ghichu || '', phuongthucthanhtoan, soluong];
+    const values = [ngaydat, tongtien, trangthai, ghichu || '', phuongthucthanhtoan, soluong, mauser];
+
+    console.log("Thực thi query:", sql, values); // 👈 In query để debug
 
     db.query(sql, values, (err, result) => {
         if (err) {
@@ -34,6 +39,7 @@ exports.createOrder = (req, res) => {
             return res.status(500).json({ message: 'Lỗi server khi thêm đơn hàng' });
         }
 
+        console.log("Tạo đơn hàng thành công, id:", result.insertId); // 👈 In để xác nhận
         res.status(201).json({ message: 'Đơn hàng đã được tạo thành công', id: result.insertId });
     });
 };
