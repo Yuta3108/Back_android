@@ -15,7 +15,20 @@ export default function Products() {
         category: "",
         sizePrices: []
     });
+    const [categories, setCategories] = useState([]);
 
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const res = await axios.get("http://localhost:5000/api/categories");
+                setCategories(res.data); // sửa nếu res.data là { categories: [...] }
+            } catch (err) {
+                console.error("Lỗi khi lấy phân loại:", err.message);
+            }
+        };
+
+        fetchCategories();
+    }, []);
     useEffect(() => {
         fetchProducts();
     }, []);
@@ -142,10 +155,15 @@ export default function Products() {
         e.preventDefault();
 
         try {
+            const sizesFormatted = newProduct.sizePrices.map(sp => ({
+                masize: sp.sizeId,
+                gia: Number(sp.price)
+            }));
+
             const payload = {
                 name: newProduct.name,
-                category: newProduct.category,
-                sizes: newProduct.sizePrices
+                category_id: Number(newProduct.category), // ✅ đảm bảo là số
+                sizes: sizesFormatted
             };
 
             await axios.post("http://localhost:5000/api/products", payload);
@@ -157,6 +175,7 @@ export default function Products() {
             alert("Thêm sản phẩm thất bại!");
         }
     };
+
 
     const isSizeSelected = (sizeId) => {
         return newProduct.sizePrices.some(sp => sp.sizeId === sizeId);
@@ -203,16 +222,19 @@ export default function Products() {
                             onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
                             required
                         />
+
                         <select
                             className="w-full border border-gray-300 rounded px-3 py-2 text-lg"
                             value={newProduct.category}
                             onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
                             required
                         >
-                            <option value="">Chọn phân loại</option>
-                            <option value="Cà phê">Cà phê</option>
-                            <option value="Trà sữa">Trà sữa</option>
-                            <option value="Khác">Khác</option>
+                            <option value="">-- Chọn phân loại --</option>
+                            {categories.map((cat) => (
+                                <option key={cat.id} value={cat.id}>
+                                    {cat.name}
+                                </option>
+                            ))}
                         </select>
 
                         <label className="font-medium text-lg">Chọn size và nhập giá:</label>
@@ -256,6 +278,7 @@ export default function Products() {
                     </form>
                 </div>
             )}
+
 
 
 

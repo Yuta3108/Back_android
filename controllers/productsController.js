@@ -159,12 +159,6 @@ exports.getProductListWithSizes = (req, res) => {
 exports.addProductWithSizes = (req, res) => {
     const { name, category_id, sizes } = req.body;
 
-    // Kiểm tra file ảnh đã được upload chưa
-    if (!req.file) {
-        return res.status(400).json({ message: 'Vui lòng tải lên ảnh sản phẩm' });
-    }
-
-    const img = req.file.filename; // tên file đã upload (lưu vào DB)
     const sizesParsed = typeof sizes === 'string' ? JSON.parse(sizes) : sizes;
 
     if (!name || !category_id || !sizesParsed || !Array.isArray(sizesParsed)) {
@@ -172,10 +166,10 @@ exports.addProductWithSizes = (req, res) => {
     }
 
     const insertProductSQL = `
-        INSERT INTO products (name, img, category_id) VALUES (?, ?, ?)
+        INSERT INTO products (name, category_id) VALUES (?, ?)
     `;
 
-    db.query(insertProductSQL, [name, img, category_id], (err, productResult) => {
+    db.query(insertProductSQL, [name, category_id], (err, productResult) => {
         if (err) {
             console.error("Lỗi khi thêm sản phẩm:", err.message);
             return res.status(500).json({ message: 'Lỗi khi thêm sản phẩm' });
