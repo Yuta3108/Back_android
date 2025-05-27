@@ -204,3 +204,34 @@ exports.addProductWithSizes = (req, res) => {
         });
     });
 };
+//API thêm 1 giá mới cho 1 size của 1 sản phẩm đã có sẵn  
+
+exports.addSizeToExistingProduct = (req, res) => {
+    const { masize, gia } = req.body;
+    const masanpham = req.params.id;
+
+    if (!masize || !gia) {
+        return res.status(400).json({ message: 'Thiếu masize hoặc giá' });
+    }
+
+    // B1: Thêm vào bảng sizeproduct
+    const insertSizeProduct = `INSERT INTO sizeproduct (masanpham, masize) VALUES (?, ?)`;
+    db.query(insertSizeProduct, [masanpham, masize], (err1) => {
+        if (err1) {
+            console.error('Lỗi khi thêm size sản phẩm:', err1);
+            return res.status(500).json({ message: 'Lỗi khi thêm size sản phẩm' });
+        }
+
+        // B2: Thêm vào bảng giasize
+        const insertGiaSize = `INSERT INTO giasize (masanpham, masize, gia) VALUES (?, ?, ?)`;
+        db.query(insertGiaSize, [masanpham, masize, gia], (err2) => {
+            if (err2) {
+                console.error('Lỗi khi thêm giá size:', err2);
+                return res.status(500).json({ message: 'Lỗi khi thêm giá size' });
+            }
+
+            return res.status(201).json({ message: 'Thêm size và giá thành công' });
+        });
+    });
+};
+
