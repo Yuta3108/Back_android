@@ -12,23 +12,23 @@ exports.getAllProducts = (req, res) => {
     });
 };
 // thêm 1 sản phẩm mới vào bảng
-exports.addProduct = (req, res) => {
-    const { name, price, category_id, img } = req.body;
+// exports.addProduct = (req, res) => {
+//     const { name, price, category_id, img } = req.body;
 
-    if (!name || !price || !category_id) {
-        return res.status(400).json({ message: 'Vui lòng nhập đầy đủ thông tin sản phẩm' });
-    }
+//     if (!name || !price || !category_id) {
+//         return res.status(400).json({ message: 'Vui lòng nhập đầy đủ thông tin sản phẩm' });
+//     }
 
-    const sql = 'INSERT INTO products (name, price, category_id, img) VALUES (?, ?, ?, ?)';
-    db.query(sql, [name, price, category_id, img || null], (err, result) => {
-        if (err) {
-            console.error(' Lỗi thêm sản phẩm:', err);
-            return res.status(500).json({ message: 'Lỗi server khi thêm sản phẩm' });
-        }
+//     const sql = 'INSERT INTO products (name, price, category_id, img) VALUES (?, ?, ?, ?)';
+//     db.query(sql, [name, price, category_id, img || null], (err, result) => {
+//         if (err) {
+//             console.error(' Lỗi thêm sản phẩm:', err);
+//             return res.status(500).json({ message: 'Lỗi server khi thêm sản phẩm' });
+//         }
 
-        res.status(201).json({ message: ' Thêm sản phẩm thành công!', productId: result.insertId });
-    });
-};
+//         res.status(201).json({ message: ' Thêm sản phẩm thành công!', productId: result.insertId });
+//     });
+// };
 //Xóa 1 sản phẩm dựa theo id
 exports.deleteProduct = (req, res) => {
     const productId = req.params.id;
@@ -154,3 +154,59 @@ exports.getProductListWithSizes = (req, res) => {
     });
 };
 
+
+// API thêm product (mã, tên sản phẩm, tên loại, tên size, giá theo size)
+exports.addProductWithSizes = (req, res) => {
+    const { name, category_id, sizes } = req.body;
+
+    // Kiểm tra file ảnh đã được upload chưa
+    if (!req.file) {
+        return res.status(400).json({ message: 'Vui lòng tải lên ảnh sản phẩm' });
+    }
+
+    const img = req.file.filename; // tên file đã upload (lưu vào DB)
+    const sizesParsed = typeof sizes === 'string' ? JSON.parse(sizes) : sizes;
+
+    if (!name || !category_id || !sizesParsed || !Array.isArray(sizesParsed)) {
+        return res.status(400).json({ message: 'Dữ liệu gửi lên không hợp lệ' });
+    }
+
+    const insertProductSQL = `
+        INSERT INTO products (name, img, category_id) VALUES (?, ?, ?)
+    `;
+
+    db.query(insertProductSQL, [name, img, category_id], (err, productResult) => {
+        if (err) {
+            console.error("Lỗi khi thêm sản phẩm:", err.message);
+            return res.status(500).json({ message: 'Lỗi khi thêm sản phẩm' });
+        }
+
+        const masanpham = productResult.insertId;
+
+        const sizeproductValues = sizesParsed.map(s => [masanpham, s.masize]);
+        const giasizeValues = sizesParsed.map(s => [masanpham, s.masize, s.gia]);
+
+        const insertSizeProductSQL = `
+            INSERT INTO sizeproduct (masanpham, masize) VALUES ?
+        `;
+        const insertGiaSizeSQL = `
+            INSERT INTO giasize (masanpham, masize, gia) VALUES ?
+        `;
+
+        db.query(insertSizeProductSQL, [sizeproductValues], (err1) => {
+            if (err1) {
+                console.error("Lỗi khi thêm vào sizeproduct:", err1.message);
+                return res.status(500).json({ message: 'Lỗi khi thêm size sản phẩm' });
+            }
+
+            db.query(insertGiaSizeSQL, [giasizeValues], (err2) => {
+                if (err2) {
+                    console.error("Lỗi khi thêm vào giasize:", err2.message);
+                    return res.status(500).json({ message: 'Lỗi khi thêm giá theo size' });
+                }
+
+                return res.status(201).json({ message: 'Thêm sản phẩm thành công' });
+            });
+        });
+    });
+};

@@ -112,6 +112,8 @@ app.use('/api/order-details', orderDetailsRoutes);
 app.use('/api/size', sizeRoutes);
 //api của users
 app.use('/api', usersRoutes);
+// Cho phép truy cập ảnh từ thư mục img/
+app.use('/img', express.static('img'));
 //  Chạy server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(` Server chạy trên cổng ${PORT}`));
