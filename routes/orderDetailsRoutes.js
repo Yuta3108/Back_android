@@ -15,5 +15,5 @@ router.delete('/:id', orderDetailsController.deleteOrderDetail);
 router.put('/:id', orderDetailsController.updateOrderDetail);
 
 
-router.get("/donhang/:id",orderDetailsController.getOrderDetails);
+router.get("/donhang/:madonhang", orderDetailsController.getOrderDetails);
 module.exports = router;

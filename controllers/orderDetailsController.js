@@ -80,21 +80,19 @@ exports.updateOrderDetail = (req, res) => {
         res.json({ message: 'Cập nhật chi tiết đơn hàng thành công' });
     });
 };
-// GET /orders/:madonhang/details
+
 exports.getOrderDetails = (req, res) => {
     const { madonhang } = req.params;
 
     const sql = `
-        SELECT 
-            u.name AS user_name,
-            p.name AS product_name,
-            ct.tonggia
-        FROM chitietdonhang ct
-        JOIN donhang dh ON ct.madonhang = dh.madonhang
-        JOIN users u ON dh.mauser = u.id
-        JOIN products p ON ct.masanpham = p.id
-        WHERE ct.madonhang = ?
-    `;
+    SELECT 
+        p.name AS product_name,
+        ct.tonggia
+    FROM chitietdonhang ct
+    LEFT JOIN donhang dh ON ct.madonhang = dh.madonhang
+    LEFT JOIN products p ON ct.masanpham = p.id
+    WHERE ct.madonhang = ?
+`;
 
     db.query(sql, [madonhang], (err, results) => {
         if (err) {
@@ -105,4 +103,5 @@ exports.getOrderDetails = (req, res) => {
         res.json(results);
     });
 };
+
 
