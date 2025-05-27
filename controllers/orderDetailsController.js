@@ -27,8 +27,8 @@ exports.createOrderDetail = (req, res) => {
         return res.status(400).json({ message: 'Vui lòng cung cấp đầy đủ thông tin: madonhang, masanpham, tonggia,soluong' });
     }
 
-    const sql = 'INSERT INTO chitietdonhang (madonhang, masanpham, tonggia) VALUES (?, ?, ?,?)';
-    db.query(sql, [madonhang, masanpham, tonggia], (err, result) => {
+    const sql = 'INSERT INTO chitietdonhang (madonhang, masanpham, tonggia,soluong) VALUES (?, ?, ?,?)';
+    db.query(sql, [madonhang, masanpham, tonggia,soluong], (err, result) => {
         if (err) {
             console.error("Lỗi khi thêm chi tiết đơn hàng:", err);
             return res.status(500).json({ message: 'Lỗi server khi thêm chi tiết đơn hàng' });
@@ -109,19 +109,14 @@ exports.getOrderDetails = (req, res) => {
   const { madonhang } = req.params;
 
   const sql = `
-                SELECT 
-            p.name AS product_name,
-            sz.size AS size,
-            gs.gia AS dongia,
-            SUM(ct.soluong) AS soluong,
-            SUM(ct.soluong * gs.gia) AS tonggia
-        FROM chitietdonhang ct
-        LEFT JOIN products p ON ct.masanpham = p.id
-        LEFT JOIN sizeproduct sp ON ct.masanpham = sp.masanpham AND ct.masize = sp.masize
-        LEFT JOIN giasize gs ON gs.masanpham = sp.masanpham AND gs.masize = sp.masize
-        LEFT JOIN sizesanpham sz ON sz.masize = sp.masize
-        WHERE ct.madonhang = ?
-        GROUP BY p.name, sz.size, gs.gia
+        SELECT 
+        p.name AS product_name,
+        ct.soluong,
+        ct.tonggia
+    FROM chitietdonhang ct
+    LEFT JOIN products p ON ct.masanpham = p.id
+    WHERE ct.madonhang = ?
+
   `;
 
   db.query(sql, [madonhang], (err, results) => {
