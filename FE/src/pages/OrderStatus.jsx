@@ -13,7 +13,7 @@ export default function OrderStatus() {
 
     const fetchOrders = async () => {
         try {
-            const res = await axios.get("http://localhost:5000/api/orders"); // <-- sửa lại nếu API này trả về danh sách
+            const res = await axios.get("http://localhost:5000/api/orders/all"); // <-- sửa lại nếu API này trả về danh sách
             setOrders(res.data);
         } catch (err) {
             console.error("Lỗi khi lấy đơn hàng:", err);
@@ -87,8 +87,8 @@ export default function OrderStatus() {
                                 <td className="px-4 py-2">{order.ghichu}</td>
                                 <td className="px-4 py-2">{order.phuongthucthanhtoan}</td>
                                 <td className="px-4 py-2">{order.soluong}</td>
-                                <td className="px-4 py-2">{order.user_name}</td>
-                                <td className="px-4 py-2">{order.product_name}</td>
+                                <td className="px-4 py-2">{order.ten_khach_hang}</td>
+                                <td className="px-4 py-2">{order.ten_san_pham}</td>
                                 <td className="px-4 py-2">
                                     <button
                                         onClick={() => handleEdit(order)}

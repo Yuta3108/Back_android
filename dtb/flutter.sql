@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1:3306
--- Thời gian đã tạo: Th5 21, 2025 lúc 03:02 PM
+-- Thời gian đã tạo: Th5 27, 2025 lúc 11:18 AM
 -- Phiên bản máy phục vụ: 8.3.0
 -- Phiên bản PHP: 8.2.18
 
@@ -57,17 +57,19 @@ CREATE TABLE IF NOT EXISTS `chitietdonhang` (
   `madonhang` int NOT NULL,
   `masanpham` int NOT NULL,
   `tonggia` float NOT NULL,
+  `soluong` int DEFAULT '1',
   PRIMARY KEY (`machitiet`),
   KEY `madonhang` (`madonhang`,`masanpham`),
   KEY `FK_msanpham` (`masanpham`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `chitietdonhang`
 --
 
-INSERT INTO `chitietdonhang` (`machitiet`, `madonhang`, `masanpham`, `tonggia`) VALUES
-(6, 4, 1, 20000);
+INSERT INTO `chitietdonhang` (`machitiet`, `madonhang`, `masanpham`, `tonggia`, `soluong`) VALUES
+(6, 4, 1, 20000, 1),
+(7, 5, 24, 15000, 1);
 
 -- --------------------------------------------------------
 
@@ -103,14 +105,15 @@ CREATE TABLE IF NOT EXISTS `donhang` (
   `mauser` int NOT NULL,
   PRIMARY KEY (`madonhang`),
   KEY `mauser` (`mauser`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `donhang`
 --
 
 INSERT INTO `donhang` (`madonhang`, `ngaydat`, `tongtien`, `trangthai`, `ghichu`, `phuongthucthanhtoan`, `soluong`, `mauser`) VALUES
-(4, '2025-05-21', 20000, 'choxuly', 'ca phe den khong duong', 'cod', 1, 3);
+(4, '2025-05-21', 20000, 'choxuly', 'ca phe den khong duong', 'cod', 1, 3),
+(5, '2025-05-27', 15000, 'choxuly', 'ít đá', 'cod', 1, 3);
 
 -- --------------------------------------------------------
 
@@ -157,7 +160,7 @@ CREATE TABLE IF NOT EXISTS `giasize` (
   PRIMARY KEY (`magiasize`),
   KEY `masanpham` (`masanpham`,`masize`),
   KEY `FK_masize1` (`masize`)
-) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `giasize`
@@ -203,7 +206,15 @@ INSERT INTO `giasize` (`magiasize`, `masanpham`, `masize`, `gia`) VALUES
 (37, 13, 1, 25000),
 (38, 13, 2, 30000),
 (39, 13, 3, 35000),
-(40, 13, 5, 40000);
+(40, 13, 5, 40000),
+(41, 22, 1, 20000),
+(42, 22, 2, 25000),
+(43, 23, 1, 20000),
+(44, 23, 2, 25000),
+(45, 25, 1, 15000),
+(46, 25, 2, 20000),
+(47, 27, 1, 15000),
+(48, 27, 2, 20000);
 
 -- --------------------------------------------------------
 
@@ -220,23 +231,28 @@ CREATE TABLE IF NOT EXISTS `products` (
   `img` varchar(250) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `category_id` (`category_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `products`
 --
 
 INSERT INTO `products` (`id`, `name`, `price`, `category_id`, `img`) VALUES
-(1, 'Cà phê đen', 10000, 1, 'img/cfden.jpg'),
-(2, 'Cà phê sữa ', 13000, 1, 'img/cfsua.png'),
-(3, 'Cà phê muối ngon hơn', 18000, 1, 'img/cfmuoi.jpg'),
-(4, 'Cà phê sữa dừa ', 25000, 1, 'img/cfsuadua.jpg'),
-(5, 'Cà phê chồn', 50000, 1, 'img/cfchon.jpg'),
-(6, 'Trà sữa truyền thống', 20000, 2, 'img/trasuatt.jpg'),
-(7, 'Trà sữa trân châu đường đen', 25000, 2, 'img/trasuatcdd.jpg'),
-(8, 'Trà sữa Atisô', 30000, 2, 'img/trasuaatiso.jpg'),
-(11, 'Sinh tố bơ', 25000, 3, 'img/stbo.jpg'),
-(13, 'Sinh tố dưa lưới', 25000, 3, 'img/stdualuoi.jpg');
+(1, 'Cà phê đen', 10000, 1, 'cfden.jpg'),
+(2, 'Cà phê sữa ', 13000, 1, 'cfsua.png'),
+(3, 'Cà phê muối ngon hơn', 18000, 1, 'cfmuoi.jpg'),
+(4, 'Cà phê sữa dừa ', 25000, 1, 'cfsuadua.jpg'),
+(5, 'Cà phê chồn', 50000, 1, 'cfchon.jpg'),
+(6, 'Trà sữa truyền thống', 20000, 2, 'trasuatt.jpg'),
+(7, 'Trà sữa trân châu đường đen', 25000, 2, 'trasuatcdd.jpg'),
+(8, 'Trà sữa Atisô', 30000, 2, 'trasuaatiso.jpg'),
+(11, 'Sinh tố bơ', 25000, 3, 'stbo.jpg'),
+(13, 'Sinh tố dưa lưới', 25000, 3, 'stdualuoi.jpg'),
+(22, 'Cà Phê Sữa Đá (test)', 0, 1, 'cfsua.png'),
+(23, 'Cà phê sữa đá bi (test 2)', 0, 1, 'img-1748265950997-91904639.png'),
+(24, 'cà phê sữa đá', 15000, 1, 'null'),
+(25, 'cà phê test thử xem như thế nào', 0, 2, ''),
+(27, 'Cà phê test ', 0, 1, '');
 
 -- --------------------------------------------------------
 
@@ -252,7 +268,7 @@ CREATE TABLE IF NOT EXISTS `sizeproduct` (
   PRIMARY KEY (`masizeproduct`),
   KEY `masizesanpham` (`masize`,`masanpham`),
   KEY `FK_masp` (`masanpham`)
-) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `sizeproduct`
@@ -269,6 +285,10 @@ INSERT INTO `sizeproduct` (`masizeproduct`, `masize`, `masanpham`) VALUES
 (29, 1, 8),
 (33, 1, 11),
 (42, 1, 13),
+(47, 1, 22),
+(49, 1, 23),
+(51, 1, 25),
+(53, 1, 27),
 (2, 2, 1),
 (6, 2, 2),
 (10, 2, 3),
@@ -279,6 +299,10 @@ INSERT INTO `sizeproduct` (`masizeproduct`, `masize`, `masanpham`) VALUES
 (30, 2, 8),
 (34, 2, 11),
 (43, 2, 13),
+(48, 2, 22),
+(50, 2, 23),
+(52, 2, 25),
+(54, 2, 27),
 (3, 3, 1),
 (7, 3, 2),
 (11, 3, 3),
@@ -311,7 +335,7 @@ CREATE TABLE IF NOT EXISTS `sizesanpham` (
   `masize` int NOT NULL AUTO_INCREMENT,
   `size` varchar(10) NOT NULL,
   PRIMARY KEY (`masize`)
-) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `sizesanpham`

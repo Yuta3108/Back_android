@@ -188,27 +188,28 @@ exports.getOrderStats = (req, res) => {
 
 //API lấy đơn hàng và chi tiết đơn hàng: 
 
-// Lấy danh sách đơn hàng theo mã user
-exports.getOrdersByUser = (req, res) => {
-    const { userId } = req.params;
-
+exports.getAllOrders = (req, res) => {
     const sql = `
         SELECT 
-            madonhang,
-            ngaydat,
-            tongtien,
-            trangthai,
-            ghichu,
-            phuongthucthanhtoan,
-            soluong
-        FROM donhang
-        WHERE mauser = ?
-        ORDER BY ngaydat DESC
+            d.madonhang,
+            d.ngaydat,
+            d.tongtien,
+            d.trangthai,
+            d.ghichu,
+            d.phuongthucthanhtoan,
+            ctdh.soluong,
+            p.name AS ten_san_pham,
+            u.name AS ten_khach_hang
+        FROM donhang d
+        JOIN chitietdonhang ctdh ON d.madonhang = ctdh.madonhang
+        JOIN products p ON ctdh.masanpham = p.id
+        JOIN users u ON d.mauser = u.id
+        ORDER BY d.ngaydat DESC
     `;
 
-    db.query(sql, [userId], (err, results) => {
+    db.query(sql, (err, results) => {
         if (err) {
-            console.error('Lỗi khi lấy đơn hàng:', err);
+            console.error('Lỗi khi lấy tất cả đơn hàng:', err);
             return res.status(500).json({ message: 'Lỗi server' });
         }
 
@@ -219,4 +220,5 @@ exports.getOrdersByUser = (req, res) => {
         res.json(results);
     });
 };
+
 
