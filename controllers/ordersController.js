@@ -194,45 +194,29 @@ exports.getOrdersByUser = (req, res) => {
 
     const sql = `
         SELECT 
-            dh.madonhang,
-            dh.ngaydat,
-            dh.tongtien,
-            dh.trangthai,
-            dh.ghichu,
-            dh.phuongthucthanhtoan,
-            dh.soluong,
-            u.name AS user_name,
-            p.name AS product_name
-        FROM donhang dh
-        JOIN users u ON dh.mauser = u.id
-        JOIN chitietdonhang ct ON dh.madonhang = ct.madonhang
-        JOIN products p ON ct.masanpham = p.id
-        WHERE u.id = ?
+            madonhang,
+            ngaydat,
+            tongtien,
+            trangthai,
+            ghichu,
+            phuongthucthanhtoan,
+            soluong
+        FROM donhang
+        WHERE mauser = ?
+        ORDER BY ngaydat DESC
     `;
 
     db.query(sql, [userId], (err, results) => {
         if (err) {
-            console.error('Lỗi khi lấy danh sách đơn hàng:', err);
-            return res.status(500).json({ message: 'Lỗi server khi lấy danh sách đơn hàng' });
+            console.error('Lỗi khi lấy đơn hàng:', err);
+            return res.status(500).json({ message: 'Lỗi server' });
         }
 
         if (results.length === 0) {
-            return res.status(404).json({ message: 'Không có đơn hàng nào cho người dùng này' });
+            return res.status(404).json({ message: 'Không có đơn hàng nào' });
         }
 
-        const orders = results.map(row => ({
-            madonhang: row.madonhang,
-            ngaydat: row.ngaydat,
-            tongtien: row.tongtien,
-            trangthai: row.trangthai,
-            ghichu: row.ghichu,
-            phuongthucthanhtoan: row.phuongthucthanhtoan,
-            soluong: row.soluong,
-            user_name: row.user_name,
-            product_name: row.product_name
-        }));
-
-        res.json(orders);
+        res.json(results);
     });
 };
 
