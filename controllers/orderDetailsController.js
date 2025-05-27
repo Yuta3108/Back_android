@@ -85,14 +85,16 @@ exports.getOrderDetails = (req, res) => {
     const { madonhang } = req.params;
 
     const sql = `
-    SELECT 
-        p.name AS product_name,
-        ct.tonggia
-    FROM chitietdonhang ct
-    LEFT JOIN donhang dh ON ct.madonhang = dh.madonhang
-    LEFT JOIN products p ON ct.masanpham = p.id
-    WHERE ct.madonhang = ?
-`;
+        SELECT 
+            p.name AS product_name,
+            p.price AS dongia,
+            dh.soluong,
+            ct.tonggia
+        FROM chitietdonhang ct
+        LEFT JOIN donhang dh ON ct.madonhang = dh.madonhang
+        LEFT JOIN products p ON ct.masanpham = p.id
+        WHERE ct.madonhang = ?
+    `;
 
     db.query(sql, [madonhang], (err, results) => {
         if (err) {
@@ -103,5 +105,4 @@ exports.getOrderDetails = (req, res) => {
         res.json(results);
     });
 };
-
 
