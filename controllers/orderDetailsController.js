@@ -21,13 +21,13 @@ exports.getOrderDetailsByOrderId = (req, res) => {
 
 // Thêm chi tiết đơn hàng mới
 exports.createOrderDetail = (req, res) => {
-    const { madonhang, masanpham, tonggia } = req.body;
+    const { madonhang, masanpham, tonggia ,soluong} = req.body;
 
     if (!madonhang || !masanpham || !tonggia) {
-        return res.status(400).json({ message: 'Vui lòng cung cấp đầy đủ thông tin: madonhang, masanpham, tonggia' });
+        return res.status(400).json({ message: 'Vui lòng cung cấp đầy đủ thông tin: madonhang, masanpham, tonggia,soluong' });
     }
 
-    const sql = 'INSERT INTO chitietdonhang (madonhang, masanpham, tonggia) VALUES (?, ?, ?)';
+    const sql = 'INSERT INTO chitietdonhang (madonhang, masanpham, tonggia) VALUES (?, ?, ?,?)';
     db.query(sql, [madonhang, masanpham, tonggia], (err, result) => {
         if (err) {
             console.error("Lỗi khi thêm chi tiết đơn hàng:", err);
@@ -106,27 +106,32 @@ exports.updateOrderDetail = (req, res) => {
 //     });
 // };
 exports.getOrderDetails = (req, res) => {
-    const { madonhang } = req.params;
+  const { madonhang } = req.params;
 
-    const sql = `
-        SELECT 
+  const sql = `
+                SELECT 
             p.name AS product_name,
-            p.price AS dongia,
-            COUNT(*) AS soluong,
-            SUM(ct.tonggia) AS tonggia
+            sz.size AS size,
+            gs.gia AS dongia,
+            SUM(ct.soluong) AS soluong,
+            SUM(ct.soluong * gs.gia) AS tonggia
         FROM chitietdonhang ct
         LEFT JOIN products p ON ct.masanpham = p.id
+        LEFT JOIN sizeproduct sp ON ct.masanpham = sp.masanpham AND ct.masize = sp.masize
+        LEFT JOIN giasize gs ON gs.masanpham = sp.masanpham AND gs.masize = sp.masize
+        LEFT JOIN sizesanpham sz ON sz.masize = sp.masize
         WHERE ct.madonhang = ?
-        GROUP BY ct.masanpham, p.name, p.price
-    `;
+        GROUP BY p.name, sz.size, gs.gia
+  `;
 
-    db.query(sql, [madonhang], (err, results) => {
-        if (err) {
-            console.error('Lỗi khi lấy chi tiết đơn hàng:', err);
-            return res.status(500).json({ message: 'Lỗi server' });
-        }
+  db.query(sql, [madonhang], (err, results) => {
+    if (err) {
+      console.error('Lỗi khi lấy chi tiết đơn hàng:', err);
+      return res.status(500).json({ message: 'Lỗi server' });
+    }
 
-        res.json(results);
-    });
+    res.json(results);
+  });
 };
+
 
