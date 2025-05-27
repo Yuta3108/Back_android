@@ -14,19 +14,24 @@ exports.getAllOrders = (req, res) => {
 
 // Thêm một đơn hàng mới
 exports.createOrder = (req, res) => {
-    const { tongtien, ghichu, phuongthucthanhtoan, soluong } = req.body;
-    const ngaydat = new Date().toISOString().slice(0, 10); // yyyy-mm-dd
+    const { tongtien, ghichu, phuongthucthanhtoan, soluong, mauser } = req.body;
+    const ngaydat = new Date().toISOString().slice(0, 10);
     const trangthai = 'choxuly';
 
-    if (!tongtien || !phuongthucthanhtoan || !soluong) {
-        return res.status(400).json({ message: 'Vui lòng nhập đầy đủ thông tin bắt buộc' });
+    console.log("Nhận request:", req.body); // 👈 In xem có vào đây không
+
+    if (!tongtien || !phuongthucthanhtoan || !soluong || !mauser) {
+        console.log("Thiếu dữ liệu");
+        return res.status(400).json({ message: 'Thiếu dữ liệu bắt buộc' });
     }
 
     const sql = `
-        INSERT INTO donhang (ngaydat, tongtien, trangthai, ghichu, phuongthucthanhtoan, soluong)
-        VALUES (?, ?, ?, ?, ?, ?)
+        INSERT INTO donhang (ngaydat, tongtien, trangthai, ghichu, phuongthucthanhtoan, soluong, mauser)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
-    const values = [ngaydat, tongtien, trangthai, ghichu || '', phuongthucthanhtoan, soluong];
+    const values = [ngaydat, tongtien, trangthai, ghichu || '', phuongthucthanhtoan, soluong, mauser];
+
+    console.log("Thực thi query:", sql, values); // 👈 In query để debug
 
     db.query(sql, values, (err, result) => {
         if (err) {
@@ -34,6 +39,7 @@ exports.createOrder = (req, res) => {
             return res.status(500).json({ message: 'Lỗi server khi thêm đơn hàng' });
         }
 
+        console.log("Tạo đơn hàng thành công, id:", result.insertId); // 👈 In để xác nhận
         res.status(201).json({ message: 'Đơn hàng đã được tạo thành công', id: result.insertId });
     });
 };
@@ -188,45 +194,29 @@ exports.getOrdersByUser = (req, res) => {
 
     const sql = `
         SELECT 
-            dh.madonhang,
-            dh.ngaydat,
-            dh.tongtien,
-            dh.trangthai,
-            dh.ghichu,
-            dh.phuongthucthanhtoan,
-            dh.soluong,
-            u.name AS user_name,
-            p.name AS product_name
-        FROM donhang dh
-        JOIN users u ON dh.mauser = u.id
-        JOIN chitietdonhang ct ON dh.madonhang = ct.madonhang
-        JOIN products p ON ct.masanpham = p.id
-        WHERE u.id = ?
+            madonhang,
+            ngaydat,
+            tongtien,
+            trangthai,
+            ghichu,
+            phuongthucthanhtoan,
+            soluong
+        FROM donhang
+        WHERE mauser = ?
+        ORDER BY ngaydat DESC
     `;
 
     db.query(sql, [userId], (err, results) => {
         if (err) {
-            console.error('Lỗi khi lấy danh sách đơn hàng:', err);
-            return res.status(500).json({ message: 'Lỗi server khi lấy danh sách đơn hàng' });
+            console.error('Lỗi khi lấy đơn hàng:', err);
+            return res.status(500).json({ message: 'Lỗi server' });
         }
 
         if (results.length === 0) {
-            return res.status(404).json({ message: 'Không có đơn hàng nào cho người dùng này' });
+            return res.status(404).json({ message: 'Không có đơn hàng nào' });
         }
 
-        const orders = results.map(row => ({
-            madonhang: row.madonhang,
-            ngaydat: row.ngaydat,
-            tongtien: row.tongtien,
-            trangthai: row.trangthai,
-            ghichu: row.ghichu,
-            phuongthucthanhtoan: row.phuongthucthanhtoan,
-            soluong: row.soluong,
-            user_name: row.user_name,
-            product_name: row.product_name
-        }));
-
-        res.json(orders);
+        res.json(results);
     });
 };
 

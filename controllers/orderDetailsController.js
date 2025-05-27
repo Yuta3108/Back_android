@@ -80,3 +80,29 @@ exports.updateOrderDetail = (req, res) => {
         res.json({ message: 'Cập nhật chi tiết đơn hàng thành công' });
     });
 };
+// GET /orders/:madonhang/details
+exports.getOrderDetails = (req, res) => {
+    const { madonhang } = req.params;
+
+    const sql = `
+        SELECT 
+            u.name AS user_name,
+            p.name AS product_name,
+            ct.tonggia
+        FROM chitietdonhang ct
+        JOIN donhang dh ON ct.madonhang = dh.madonhang
+        JOIN users u ON dh.mauser = u.id
+        JOIN products p ON ct.masanpham = p.id
+        WHERE ct.madonhang = ?
+    `;
+
+    db.query(sql, [madonhang], (err, results) => {
+        if (err) {
+            console.error('Lỗi khi lấy chi tiết đơn hàng:', err);
+            return res.status(500).json({ message: 'Lỗi server' });
+        }
+
+        res.json(results);
+    });
+};
+

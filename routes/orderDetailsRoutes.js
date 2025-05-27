@@ -14,4 +14,6 @@ router.delete('/:id', orderDetailsController.deleteOrderDetail);
 // API: Cập nhật chi tiết đơn hàng
 router.put('/:id', orderDetailsController.updateOrderDetail);
 
+
+router.get("/donhang/:id",orderDetailsController.getOrderDetails);
 module.exports = router;
