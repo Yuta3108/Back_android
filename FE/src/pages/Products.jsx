@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-
 export default function Products() {
     const [products, setProducts] = useState([]);
     const [sizes, setSizes] = useState([]);
@@ -9,6 +8,9 @@ export default function Products() {
     const [editingSizeId, setEditingSizeId] = useState(null);
     const [editingSizeValue, setEditingSizeValue] = useState("");
     const [showAddModal, setShowAddModal] = useState(false);
+    const [showAddSizePriceModal, setShowAddSizePriceModal] = useState(false);
+    const [selectedProductId, setSelectedProductId] = useState("");
+    const [sizePriceList, setSizePriceList] = useState([]);
     const [newProduct, setNewProduct] = useState({
         name: "",
         image: "",
@@ -16,7 +18,6 @@ export default function Products() {
         sizePrices: []
     });
     const [categories, setCategories] = useState([]);
-
     useEffect(() => {
         const fetchCategories = async () => {
             try {
@@ -26,13 +27,11 @@ export default function Products() {
                 console.error("Lỗi khi lấy phân loại:", err.message);
             }
         };
-
         fetchCategories();
     }, []);
     useEffect(() => {
         fetchProducts();
     }, []);
-
     const fetchProducts = () => {
         axios.get("http://localhost:5000/api/products/products-with-sizes")
             .then(res => {
@@ -57,20 +56,17 @@ export default function Products() {
             })
             .catch(err => console.error("Lỗi khi gọi API:", err));
     };
-
     const fetchSizes = () => {
         axios.get("http://localhost:5000/api/size")
             .then(res => setSizes(res.data?.data || []))
             .catch(err => console.error("Lỗi khi lấy danh sách size:", err.message));
     };
-
     const handleToggleSizes = () => {
         if (!showSizes) fetchSizes();
         setShowSizes(!showSizes);
         setNewSize("");
         setEditingSizeId(null);
     };
-
     const handleAddSize = () => {
         if (!newSize.trim()) return;
         axios.post("http://localhost:5000/api/size", { size: newSize })
@@ -84,7 +80,6 @@ export default function Products() {
                 alert("Thêm size thất bại!");
             });
     };
-
     const handleDeleteSize = (masize) => {
         if (!window.confirm("Bạn có chắc chắn muốn xoá size này không?")) return;
         axios.delete(`http://localhost:5000/api/size/${masize}`)
@@ -101,12 +96,10 @@ export default function Products() {
                 }
             });
     };
-
     const handleEditClick = (size) => {
         setEditingSizeId(size.masize);
         setEditingSizeValue(size.size);
     };
-
     const handleUpdateSize = () => {
         if (!editingSizeValue.trim()) return;
         axios.put(`http://localhost:5000/api/size/${editingSizeId}`, { size: editingSizeValue })
@@ -121,12 +114,10 @@ export default function Products() {
                 alert("Cập nhật size thất bại!");
             });
     };
-
     const handleCancelEdit = () => {
         setEditingSizeId(null);
         setEditingSizeValue("");
     };
-
     const toggleSizeSelection = (sizeId) => {
         const exists = newProduct.sizePrices.find(sp => sp.sizeId === sizeId);
         if (exists) {
@@ -141,7 +132,6 @@ export default function Products() {
             }));
         }
     };
-
     const handlePriceChange = (sizeId, price) => {
         setNewProduct(prev => ({
             ...prev,
@@ -150,10 +140,8 @@ export default function Products() {
             )
         }));
     };
-
     const handleAddProduct = async (e) => {
         e.preventDefault();
-
         try {
             const sizesFormatted = newProduct.sizePrices.map(sp => ({
                 masize: sp.sizeId,
@@ -175,40 +163,48 @@ export default function Products() {
             alert("Thêm sản phẩm thất bại!");
         }
     };
-
-
     const isSizeSelected = (sizeId) => {
         return newProduct.sizePrices.some(sp => sp.sizeId === sizeId);
     };
-
     const getSizePrice = (sizeId) => {
         const found = newProduct.sizePrices.find(sp => sp.sizeId === sizeId);
         return found?.price || "";
     };
-
     return (
         <div className="p-6 bg-[#fdfaf6] min-h-screen text-[#4b2e2e] flex flex-col items-center text-center">
             <h2 className="text-2xl font-bold mb-4">🛒 Quản lý Sản phẩm</h2>
 
-            <div className="flex gap-4 mb-4">
+            <div className="flex items-center gap-4 mb-4">
                 <button
                     onClick={() => {
                         fetchSizes();
                         setNewProduct({ name: "", image: "", category: "", sizePrices: [] });
                         setShowAddModal(true);
                     }}
-                    className="bg-[#7a5b4a] hover:bg-[#5d4034] text-[#fdfaf6] font-medium py-2 px-4 rounded-lg transition"
+                    className="flex items-center gap-2 bg-[#7a5b4a] hover:bg-[#5d4034] text-[#fdfaf6] font-medium text-sm py-2.5 px-5 rounded-lg transition"
                 >
-                    ➕ Thêm sản phẩm
+                    <span>➕</span> Thêm sản phẩm
                 </button>
                 <button
                     onClick={handleToggleSizes}
-                    className="bg-[#7a5b4a] hover:bg-[#5d4034] text-[#fdfaf6] font-medium py-2 px-4 rounded-lg transition"
+                    className="flex items-center gap-2 bg-[#7a5b4a] hover:bg-[#5d4034] text-[#fdfaf6] font-medium text-sm py-2.5 px-5 rounded-lg transition"
                 >
-                    ➕ Thêm size
+                    <span>➕</span> Thêm size
                 </button>
-            </div>
+                <button
+                    onClick={() => {
+                        fetchSizes();
+                        fetchProducts();
+                        setSelectedProductId("");
+                        setSizePriceList([]);
+                        setShowAddSizePriceModal(true);
+                    }}
+                    className="flex items-center gap-2 bg-[#7a5b4a] hover:bg-[#5d4034] text-[#fdfaf6] font-medium text-sm py-2.5 px-5 rounded-lg transition"
+                >
+                    <span>➕</span> Thêm giá theo size
+                </button>
 
+            </div>
             {/* Modal Thêm Sản Phẩm */}
             {showAddModal && (
                 <div className="bg-white shadow-md border rounded-lg p-4 mb-6 w-full max-w-2xl text-left">
@@ -278,10 +274,6 @@ export default function Products() {
                     </form>
                 </div>
             )}
-
-
-
-
             {/* Modal Quản lý Size */}
             {showSizes && (
                 <div className="bg-white shadow-md border rounded-lg p-4 mb-6 w-full max-w-md text-left">
@@ -327,7 +319,107 @@ export default function Products() {
                     </div>
                 </div>
             )}
+            {/* Modal Thêm giá theo size */}
+            {showAddSizePriceModal && (
+                <div className="bg-white shadow-md border rounded-lg p-4 mb-6 w-full max-w-2xl text-left">
+                    <h2 className="text-lg font-semibold mb-4">➕ Thêm giá theo size</h2>
 
+                    <div className="mb-4">
+                        <label className="block font-medium mb-1">Chọn sản phẩm:</label>
+                        <select
+                            className="w-full border border-gray-300 rounded px-3 py-2 text-lg"
+                            value={selectedProductId}
+                            onChange={(e) => {
+                                setSelectedProductId(e.target.value);
+                                setSizePriceList([]); // reset size selection
+                            }}
+                        >
+                            <option value="">-- Chọn sản phẩm --</option>
+                            {products.map((p) => (
+                                <option key={p.id} value={p.id}>
+                                    {p.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {selectedProductId && (
+                        <>
+                            <label className="font-medium text-lg">Chọn size và nhập giá:</label>
+                            <div className="grid grid-cols-2 gap-4 mb-4">
+                                {sizes.map((size) => {
+                                    const isSelected = sizePriceList.some(s => s.masize === size.masize);
+                                    const price = sizePriceList.find(s => s.masize === size.masize)?.gia || "";
+
+                                    return (
+                                        <div key={size.masize} className="flex items-center gap-2 text-lg">
+                                            <input
+                                                type="checkbox"
+                                                checked={isSelected}
+                                                onChange={() => {
+                                                    if (isSelected) {
+                                                        setSizePriceList(prev => prev.filter(s => s.masize !== size.masize));
+                                                    } else {
+                                                        setSizePriceList(prev => [...prev, { masize: size.masize, gia: "" }]);
+                                                    }
+                                                }}
+                                            />
+                                            <label>{size.size}</label>
+                                            {isSelected && (
+                                                <input
+                                                    type="number"
+                                                    placeholder="Giá"
+                                                    className="border border-gray-300 rounded px-2 py-1 w-full"
+                                                    value={price}
+                                                    onChange={(e) => {
+                                                        const newPrice = e.target.value;
+                                                        setSizePriceList(prev =>
+                                                            prev.map(sp =>
+                                                                sp.masize === size.masize ? { ...sp, gia: newPrice } : sp
+                                                            )
+                                                        );
+                                                    }}
+                                                />
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+
+                            <div className="flex justify-end gap-2">
+                                <button
+                                    onClick={async () => {
+                                        try {
+                                            for (const sp of sizePriceList) {
+                                                const payload = {
+                                                    masize: sp.masize,
+                                                    gia: Number(sp.gia),
+                                                };
+                                                await axios.post(`http://localhost:5000/api/products/${selectedProductId}/add-size`, payload);
+                                            }
+                                            alert("Đã thêm giá theo size!");
+                                            setShowAddSizePriceModal(false);
+                                            fetchProducts();
+                                        } catch (err) {
+                                            console.error(err);
+                                            alert("Thêm giá theo size thất bại!");
+                                        }
+                                    }}
+                                    className="px-4 py-2 bg-[#c2a28b] text-white rounded hover:bg-[#b3907c] text-lg"
+                                >
+                                    Lưu
+                                </button>
+                                <button
+                                    onClick={() => setShowAddSizePriceModal(false)}
+                                    className="px-4 py-2 bg-[#d4795b] text-white rounded hover:bg-[#bd644a] text-lg"
+                                >
+                                    Huỷ
+                                </button>
+                            </div>
+                        </>
+                    )}
+                </div>
+            )}
             {/* Danh sách sản phẩm */}
             <table className="table-auto border-collapse w-full max-w-5xl text-left">
                 <thead>
