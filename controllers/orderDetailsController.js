@@ -81,6 +81,30 @@ exports.updateOrderDetail = (req, res) => {
     });
 };
 
+// exports.getOrderDetails = (req, res) => {
+//     const { madonhang } = req.params;
+
+//     const sql = `
+//         SELECT 
+//             p.name AS product_name,
+//             p.price AS dongia,
+//             dh.soluong,
+//             ct.tonggia
+//         FROM chitietdonhang ct
+//         LEFT JOIN donhang dh ON ct.madonhang = dh.madonhang
+//         LEFT JOIN products p ON ct.masanpham = p.id
+//         WHERE ct.madonhang = ?
+//     `;
+
+//     db.query(sql, [madonhang], (err, results) => {
+//         if (err) {
+//             console.error('Lỗi khi lấy chi tiết đơn hàng:', err);
+//             return res.status(500).json({ message: 'Lỗi server' });
+//         }
+
+//         res.json(results);
+//     });
+// };
 exports.getOrderDetails = (req, res) => {
     const { madonhang } = req.params;
 
@@ -88,12 +112,12 @@ exports.getOrderDetails = (req, res) => {
         SELECT 
             p.name AS product_name,
             p.price AS dongia,
-            dh.soluong,
-            ct.tonggia
+            COUNT(*) AS soluong,
+            SUM(ct.tonggia) AS tonggia
         FROM chitietdonhang ct
-        LEFT JOIN donhang dh ON ct.madonhang = dh.madonhang
         LEFT JOIN products p ON ct.masanpham = p.id
         WHERE ct.madonhang = ?
+        GROUP BY ct.masanpham, p.name, p.price
     `;
 
     db.query(sql, [madonhang], (err, results) => {
