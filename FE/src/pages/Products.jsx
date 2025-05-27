@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import axios from "axios";
 
@@ -143,22 +142,8 @@ export default function Products() {
         e.preventDefault();
 
         try {
-            let imageName = "";
-
-            if (newProduct.image) {
-                const formData = new FormData();
-                formData.append("file", newProduct.image);
-
-                const uploadRes = await axios.post("http://localhost:5000/api/upload", formData, {
-                    headers: { "Content-Type": "multipart/form-data" }
-                });
-
-                imageName = uploadRes.data?.filename;
-            }
-
             const payload = {
                 name: newProduct.name,
-                image: imageName,
                 category: newProduct.category,
                 sizes: newProduct.sizePrices
             };
@@ -217,12 +202,6 @@ export default function Products() {
                             value={newProduct.name}
                             onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
                             required
-                        />
-                        <input
-                            type="file"
-                            accept="image/*"
-                            className="w-full border border-gray-300 rounded px-3 py-2 text-lg"
-                            onChange={(e) => setNewProduct({ ...newProduct, image: e.target.files[0] })}
                         />
                         <select
                             className="w-full border border-gray-300 rounded px-3 py-2 text-lg"
@@ -332,7 +311,6 @@ export default function Products() {
                     <tr className="bg-[#8b6b5c] text-[#fdfaf6]">
                         <th className="border px-4 py-2">ID</th>
                         <th className="border px-4 py-2">Tên sản phẩm</th>
-                        <th className="border px-4 py-2">Ảnh</th>
                         <th className="border px-4 py-2">Phân loại</th>
                         <th className="border px-4 py-2">Giá theo size</th>
                         <th className="border px-4 py-2">Ngày tạo</th>
@@ -345,13 +323,6 @@ export default function Products() {
                         <tr key={product.id} className="hover:bg-[#f0e8df]">
                             <td className="border px-4 py-2">{product.id}</td>
                             <td className="border px-4 py-2">{product.name}</td>
-                            <td className="border px-4 py-2">
-                                <img
-                                    src={`http://localhost:5000/img/${product.image}`}
-                                    alt={product.name}
-                                    className="max-w-[100px] max-h-[100px] object-cover rounded"
-                                />
-                            </td>
                             <td className="border px-4 py-2">{product.category}</td>
 
                             <td className="border px-4 py-2">
