@@ -34,7 +34,7 @@ router.get('/stats', productsController.getProductStats);
 // Lấy sản phẩm có thông tin size + giá
 router.get('/products-with-sizes', productsController.getProductListWithSizes);
 
-// ✅ Thêm sản phẩm mới (gồm size, giá, ảnh upload)
-router.post('/', upload.single('img'), productsController.addProductWithSizes);
+// ✅ Thêm sản phẩm mới (gồm size, giá — KHÔNG CÒN upload ảnh)
+router.post('/', productsController.addProductWithSizes);
 
 module.exports = router;

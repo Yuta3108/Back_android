@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import axios from "axios";
 
@@ -16,7 +15,20 @@ export default function Products() {
         category: "",
         sizePrices: []
     });
+    const [categories, setCategories] = useState([]);
 
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const res = await axios.get("http://localhost:5000/api/categories");
+                setCategories(res.data); // sửa nếu res.data là { categories: [...] }
+            } catch (err) {
+                console.error("Lỗi khi lấy phân loại:", err.message);
+            }
+        };
+
+        fetchCategories();
+    }, []);
     useEffect(() => {
         fetchProducts();
     }, []);
@@ -143,24 +155,15 @@ export default function Products() {
         e.preventDefault();
 
         try {
-            let imageName = "";
-
-            if (newProduct.image) {
-                const formData = new FormData();
-                formData.append("file", newProduct.image);
-
-                const uploadRes = await axios.post("http://localhost:5000/api/upload", formData, {
-                    headers: { "Content-Type": "multipart/form-data" }
-                });
-
-                imageName = uploadRes.data?.filename;
-            }
+            const sizesFormatted = newProduct.sizePrices.map(sp => ({
+                masize: sp.sizeId,
+                gia: Number(sp.price)
+            }));
 
             const payload = {
                 name: newProduct.name,
-                image: imageName,
-                category: newProduct.category,
-                sizes: newProduct.sizePrices
+                category_id: Number(newProduct.category), // ✅ đảm bảo là số
+                sizes: sizesFormatted
             };
 
             await axios.post("http://localhost:5000/api/products", payload);
@@ -172,6 +175,7 @@ export default function Products() {
             alert("Thêm sản phẩm thất bại!");
         }
     };
+
 
     const isSizeSelected = (sizeId) => {
         return newProduct.sizePrices.some(sp => sp.sizeId === sizeId);
@@ -218,22 +222,19 @@ export default function Products() {
                             onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
                             required
                         />
-                        <input
-                            type="file"
-                            accept="image/*"
-                            className="w-full border border-gray-300 rounded px-3 py-2 text-lg"
-                            onChange={(e) => setNewProduct({ ...newProduct, image: e.target.files[0] })}
-                        />
+
                         <select
                             className="w-full border border-gray-300 rounded px-3 py-2 text-lg"
                             value={newProduct.category}
                             onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
                             required
                         >
-                            <option value="">Chọn phân loại</option>
-                            <option value="Cà phê">Cà phê</option>
-                            <option value="Trà sữa">Trà sữa</option>
-                            <option value="Khác">Khác</option>
+                            <option value="">-- Chọn phân loại --</option>
+                            {categories.map((cat) => (
+                                <option key={cat.id} value={cat.id}>
+                                    {cat.name}
+                                </option>
+                            ))}
                         </select>
 
                         <label className="font-medium text-lg">Chọn size và nhập giá:</label>
@@ -277,6 +278,7 @@ export default function Products() {
                     </form>
                 </div>
             )}
+
 
 
 
@@ -332,7 +334,6 @@ export default function Products() {
                     <tr className="bg-[#8b6b5c] text-[#fdfaf6]">
                         <th className="border px-4 py-2">ID</th>
                         <th className="border px-4 py-2">Tên sản phẩm</th>
-                        <th className="border px-4 py-2">Ảnh</th>
                         <th className="border px-4 py-2">Phân loại</th>
                         <th className="border px-4 py-2">Giá theo size</th>
                         <th className="border px-4 py-2">Ngày tạo</th>
@@ -345,13 +346,6 @@ export default function Products() {
                         <tr key={product.id} className="hover:bg-[#f0e8df]">
                             <td className="border px-4 py-2">{product.id}</td>
                             <td className="border px-4 py-2">{product.name}</td>
-                            <td className="border px-4 py-2">
-                                <img
-                                    src={`http://localhost:5000/img/${product.image}`}
-                                    alt={product.name}
-                                    className="max-w-[100px] max-h-[100px] object-cover rounded"
-                                />
-                            </td>
                             <td className="border px-4 py-2">{product.category}</td>
 
                             <td className="border px-4 py-2">
