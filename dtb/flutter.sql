@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1:3306
--- Thời gian đã tạo: Th5 27, 2025 lúc 11:18 AM
+-- Thời gian đã tạo: Th5 28, 2025 lúc 05:26 AM
 -- Phiên bản máy phục vụ: 8.3.0
 -- Phiên bản PHP: 8.2.18
 
@@ -361,6 +361,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `name` varchar(250) NOT NULL,
   `phone` varchar(15) NOT NULL,
   `address` varchar(250) NOT NULL,
+  `device_token` text,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -368,9 +369,9 @@ CREATE TABLE IF NOT EXISTS `users` (
 -- Đang đổ dữ liệu cho bảng `users`
 --
 
-INSERT INTO `users` (`id`, `email`, `password`, `name`, `phone`, `address`) VALUES
-(3, 'san@gmail.com', '123', 'thanh san', '01234567899', '123 bong sao'),
-(4, '6@gmail.com', '123', 'chu 6', '1234567897', '123 cau chu y');
+INSERT INTO `users` (`id`, `email`, `password`, `name`, `phone`, `address`, `device_token`) VALUES
+(3, 'san@gmail.com', '123', 'thanh san', '01234567899', '123 bong sao', NULL),
+(4, '6@gmail.com', '123', 'chu 6', '1234567897', '123 cau chu y', NULL);
 
 --
 -- Các ràng buộc cho các bảng đã đổ
