@@ -1,4 +1,72 @@
 const db = require('../db');
+const { sendOrderStatusChangedNotification } = require('../ThongBao'); // Đảm bảo đúng path
+
+exports.updateOrderStatus = (req, res) => {
+    const { id } = req.params;
+    const { trangthai } = req.body;
+
+    if (!trangthai) {
+        return res.status(400).json({ message: 'Vui lòng cung cấp trạng thái mới' });
+    }
+
+    const sqlGetCurrentStatus = 'SELECT trangthai, mauser FROM donhang WHERE madonhang = ?';
+
+    db.query(sqlGetCurrentStatus, [id], (err, results) => {
+        if (err) {
+            console.error('❌ Lỗi khi truy vấn trạng thái hiện tại:', err);
+            return res.status(500).json({ message: 'Lỗi server khi truy vấn đơn hàng' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ message: 'Không tìm thấy đơn hàng' });
+        }
+
+        const currentStatus = results[0].trangthai;
+        const mauser = results[0].mauser;
+
+        if (currentStatus === 'dathanhcong') {
+            return res.status(400).json({
+                message: 'Đơn hàng đã được giao thành công, không thể thay đổi trạng thái nữa'
+            });
+        }
+
+        if (currentStatus === trangthai) {
+            return res.status(200).json({ message: 'Trạng thái không thay đổi' });
+        }
+
+        const sqlUpdateStatus = 'UPDATE donhang SET trangthai = ? WHERE madonhang = ?';
+        db.query(sqlUpdateStatus, [trangthai, id], async (err) => {
+            if (err) {
+                console.error('❌ Lỗi khi cập nhật trạng thái:', err);
+                return res.status(500).json({ message: 'Lỗi server khi cập nhật trạng thái' });
+            }
+
+            // 🔍 Lấy token từ bảng users
+            const sqlGetToken = 'SELECT token FROM users WHERE id = ?';
+            db.query(sqlGetToken, [mauser], async (err, tokenResults) => {
+                if (err) {
+                    console.error('❌ Lỗi khi lấy token người dùng:', err);
+                    return res.status(500).json({ message: 'Cập nhật thành công nhưng không gửi được thông báo' });
+                }
+
+                const token = tokenResults[0]?.token;
+                if (token) {
+                    try {
+                        await sendOrderStatusChangedNotification(token, trangthai, id);
+                        console.log('✅ Đã gửi thông báo trạng thái đơn hàng');
+                    } catch (notifyErr) {
+                        console.error('❌ Gửi thông báo thất bại:', notifyErr);
+                        // Không return lỗi, vẫn báo thành công vì DB đã cập nhật rồi
+                    }
+                } else {
+                    console.warn('⚠️ Không tìm thấy token của người dùng');
+                }
+
+                return res.json({ message: 'Cập nhật trạng thái thành công' });
+            });
+        });
+    });
+};
 
 // Lấy tất cả đơn hàng
 exports.getAllOrders = (req, res) => {
@@ -64,6 +132,52 @@ exports.deleteOrder = (req, res) => {
 };
 
 // Cập nhật trạng thái đơn hàng (có điều kiện)
+// exports.updateOrderStatus = (req, res) => {
+//     const { id } = req.params;
+//     const { trangthai } = req.body;
+
+//     if (!trangthai) {
+//         return res.status(400).json({ message: 'Vui lòng cung cấp trạng thái mới' });
+//     }
+
+//     const sqlGetCurrentStatus = 'SELECT trangthai FROM donhang WHERE madonhang = ?';
+
+//     db.query(sqlGetCurrentStatus, [id], (err, results) => {
+//         if (err) {
+//             console.error('Lỗi khi truy vấn trạng thái hiện tại:', err);
+//             return res.status(500).json({ message: 'Lỗi server khi truy vấn đơn hàng' });
+//         }
+
+//         if (results.length === 0) {
+//             return res.status(404).json({ message: 'Không tìm thấy đơn hàng' });
+//         }
+
+//         const currentStatus = results[0].trangthai;
+
+//         // Nếu trạng thái hiện tại là "dathanhcong" thì không cho phép cập nhật nữa
+//         if (currentStatus === 'dathanhcong') {
+//             return res.status(400).json({
+//                 message: 'Đơn hàng đã được giao thành công, không thể thay đổi trạng thái nữa'
+//             });
+//         }
+
+//         // Nếu không thay đổi gì thì không cần update
+//         if (currentStatus === trangthai) {
+//             return res.status(200).json({ message: 'Trạng thái không thay đổi' });
+//         }
+
+//         // Thực hiện cập nhật trạng thái
+//         const sqlUpdateStatus = 'UPDATE donhang SET trangthai = ? WHERE madonhang = ?';
+//         db.query(sqlUpdateStatus, [trangthai, id], (err) => {
+//             if (err) {
+//                 console.error('Lỗi khi cập nhật trạng thái:', err);
+//                 return res.status(500).json({ message: 'Lỗi server khi cập nhật trạng thái' });
+//             }
+
+//             res.json({ message: 'Cập nhật trạng thái thành công' });
+//         });
+//     });
+// };
 exports.updateOrderStatus = (req, res) => {
     const { id } = req.params;
     const { trangthai } = req.body;
@@ -72,11 +186,11 @@ exports.updateOrderStatus = (req, res) => {
         return res.status(400).json({ message: 'Vui lòng cung cấp trạng thái mới' });
     }
 
-    const sqlGetCurrentStatus = 'SELECT trangthai FROM donhang WHERE madonhang = ?';
+    const sqlGetCurrentStatus = 'SELECT trangthai, mauser FROM donhang WHERE madonhang = ?';
 
     db.query(sqlGetCurrentStatus, [id], (err, results) => {
         if (err) {
-            console.error('Lỗi khi truy vấn trạng thái hiện tại:', err);
+            console.error('❌ Lỗi khi truy vấn trạng thái hiện tại:', err);
             return res.status(500).json({ message: 'Lỗi server khi truy vấn đơn hàng' });
         }
 
@@ -85,28 +199,48 @@ exports.updateOrderStatus = (req, res) => {
         }
 
         const currentStatus = results[0].trangthai;
+        const mauser = results[0].mauser;
 
-        // Nếu trạng thái hiện tại là "dathanhcong" thì không cho phép cập nhật nữa
         if (currentStatus === 'dathanhcong') {
             return res.status(400).json({
                 message: 'Đơn hàng đã được giao thành công, không thể thay đổi trạng thái nữa'
             });
         }
 
-        // Nếu không thay đổi gì thì không cần update
         if (currentStatus === trangthai) {
             return res.status(200).json({ message: 'Trạng thái không thay đổi' });
         }
 
-        // Thực hiện cập nhật trạng thái
         const sqlUpdateStatus = 'UPDATE donhang SET trangthai = ? WHERE madonhang = ?';
-        db.query(sqlUpdateStatus, [trangthai, id], (err) => {
+        db.query(sqlUpdateStatus, [trangthai, id], async (err) => {
             if (err) {
-                console.error('Lỗi khi cập nhật trạng thái:', err);
+                console.error('❌ Lỗi khi cập nhật trạng thái:', err);
                 return res.status(500).json({ message: 'Lỗi server khi cập nhật trạng thái' });
             }
 
-            res.json({ message: 'Cập nhật trạng thái thành công' });
+            // 🔍 Lấy device_token từ bảng users
+            const sqlGetToken = 'SELECT device_token FROM users WHERE id = ?';
+            db.query(sqlGetToken, [mauser], async (err, tokenResults) => {
+                if (err) {
+                    console.error('❌ Lỗi khi lấy token người dùng:', err);
+                    return res.status(500).json({ message: 'Cập nhật thành công nhưng không gửi được thông báo' });
+                }
+
+                const token = tokenResults[0]?.device_token;
+                if (token) {
+                    try {
+                        await sendOrderStatusChangedNotification(token, trangthai, id);
+                        console.log('✅ Đã gửi thông báo trạng thái đơn hàng');
+                    } catch (notifyErr) {
+                        console.error('❌ Gửi thông báo thất bại:', notifyErr);
+                        // Không return lỗi, vẫn báo thành công vì DB đã cập nhật rồi
+                    }
+                } else {
+                    console.warn('⚠️ Không tìm thấy device_token của người dùng');
+                }
+
+                return res.json({ message: 'Cập nhật trạng thái thành công' });
+            });
         });
     });
 };
@@ -196,9 +330,11 @@ exports.getAllOrders = (req, res) => {
             d.trangthai,
             d.ghichu,
             d.phuongthucthanhtoan,
-            ctdh.soluong,
+            u.id AS user_id,
+            u.name AS ten_khach_hang,
+            p.id AS product_id,
             p.name AS ten_san_pham,
-            u.name AS ten_khach_hang
+            ctdh.soluong
         FROM donhang d
         JOIN chitietdonhang ctdh ON d.madonhang = ctdh.madonhang
         JOIN products p ON ctdh.masanpham = p.id
@@ -208,7 +344,7 @@ exports.getAllOrders = (req, res) => {
 
     db.query(sql, (err, results) => {
         if (err) {
-            console.error('Lỗi khi lấy tất cả đơn hàng:', err);
+            console.error('❌ Lỗi khi lấy tất cả đơn hàng:', err);
             return res.status(500).json({ message: 'Lỗi server' });
         }
 
@@ -216,7 +352,49 @@ exports.getAllOrders = (req, res) => {
             return res.status(404).json({ message: 'Không có đơn hàng nào' });
         }
 
-        res.json(results);
+        // Gom lại theo đơn hàng
+        const ordersMap = {};
+
+        results.forEach(row => {
+            const {
+                madonhang,
+                ngaydat,
+                tongtien,
+                trangthai,
+                ghichu,
+                phuongthucthanhtoan,
+                user_id,
+                ten_khach_hang,
+                product_id,
+                ten_san_pham,
+                soluong
+            } = row;
+
+            if (!ordersMap[madonhang]) {
+                ordersMap[madonhang] = {
+                    madonhang,
+                    ngaydat,
+                    tongtien,
+                    trangthai,
+                    ghichu,
+                    phuongthucthanhtoan,
+                    user: {
+                        id: user_id,
+                        name: ten_khach_hang
+                    },
+                    chitiet: []
+                };
+            }
+
+            ordersMap[madonhang].chitiet.push({
+                product_id,
+                ten_san_pham,
+                soluong
+            });
+        });
+
+        const orders = Object.values(ordersMap);
+        res.json(orders);
     });
 };
 

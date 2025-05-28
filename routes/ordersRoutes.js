@@ -3,7 +3,7 @@ const router = express.Router();
 const ordersController = require('../controllers/ordersController');
 
 // Lấy tất cả đơn hàng
-router.get('/', ordersController.getAllOrders);
+//router.get('/', ordersController.getAllOrders);
 
 // Tạo một đơn hàng mới
 router.post('/', ordersController.createOrder);

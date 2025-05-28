@@ -76,30 +76,47 @@ export default function OrderStatus() {
                         </tr>
                     </thead>
                     <tbody>
-                        {orders.map((order, index) => (
-                            <tr key={index} className="border-b hover:bg-[#fefaf4] transition">
-                                <td className="px-4 py-2">{order.madonhang}</td>
-                                <td className="px-4 py-2">
-                                    {new Date(order.ngaydat).toLocaleDateString()}
-                                </td>
-                                <td className="px-4 py-2">{order.tongtien.toLocaleString()} đ</td>
-                                <td className="px-4 py-2 capitalize">{order.trangthai}</td>
-                                <td className="px-4 py-2">{order.ghichu}</td>
-                                <td className="px-4 py-2">{order.phuongthucthanhtoan}</td>
-                                <td className="px-4 py-2">{order.soluong}</td>
-                                <td className="px-4 py-2">{order.ten_khach_hang}</td>
-                                <td className="px-4 py-2">{order.ten_san_pham}</td>
-                                <td className="px-4 py-2">
-                                    <button
-                                        onClick={() => handleEdit(order)}
-                                        className="mr-2 px-2 py-1 bg-[#c2a28b] rounded hover:bg-[#b3907c]"
-                                    >
-                                        Sửa
-                                    </button>
-                                </td>
-                            </tr>
+                        {orders.map((order, orderIndex) => (
+                            order.chitiet.map((item, itemIndex) => (
+                                <tr key={`${order.madonhang}-${itemIndex}`} className="border-b hover:bg-[#fefaf4] transition">
+                                    {/* Chỉ render các cột đơn hàng ở dòng đầu tiên của mỗi đơn */}
+                                    {itemIndex === 0 && (
+                                        <>
+                                            <td rowSpan={order.chitiet.length} className="px-4 py-2 text-center">{order.madonhang}</td>
+                                            <td rowSpan={order.chitiet.length} className="px-4 py-2 text-center">
+                                                {new Date(order.ngaydat).toLocaleDateString()}
+                                            </td>
+                                            <td rowSpan={order.chitiet.length} className="px-4 py-2 text-right">
+                                                {order.tongtien.toLocaleString()} đ
+                                            </td>
+                                            <td rowSpan={order.chitiet.length} className="px-4 py-2 capitalize text-center">{order.trangthai}</td>
+                                            <td rowSpan={order.chitiet.length} className="px-4 py-2 text-left">{order.ghichu}</td>
+                                            <td rowSpan={order.chitiet.length} className="px-4 py-2 text-center">{order.phuongthucthanhtoan}</td>
+                                        </>
+                                    )}
+
+                                    {/* Luôn hiển thị các cột chi tiết sản phẩm */}
+                                    <td className="px-4 py-2 text-center">{item.soluong}</td>
+                                    <td className="px-4 py-2 text-center">{order.user.name}</td>
+                                    <td className="px-4 py-2 text-left">{item.ten_san_pham}</td>
+
+                                    {/* Chỉ hiển thị nút sửa 1 lần cho mỗi đơn */}
+                                    {itemIndex === 0 && (
+                                        <td rowSpan={order.chitiet.length} className="px-4 py-2 text-center">
+                                            <button
+                                                onClick={() => handleEdit(order)}
+                                                className="px-2 py-1 bg-[#c2a28b] rounded hover:bg-[#b3907c]"
+                                            >
+                                                Sửa
+                                            </button>
+                                        </td>
+                                    )}
+                                </tr>
+                            ))
                         ))}
                     </tbody>
+
+
                 </table>
             </div>
 
