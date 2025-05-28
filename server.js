@@ -115,17 +115,27 @@ app.use('/img', express.static('img'));
     });
   // Gửi thông báo cập nhật trạng thái đơn hàng
   app.put("/order/:id/status", async (req, res) => {
-    const madonhang = req.params.id;
-    const { newStatus, deviceToken } = req.body;
+  const madonhang = req.params.id;
+  const { newStatus, deviceToken } = req.body;
 
-    try {
-      await sendOrderStatusChangedNotification(deviceToken, newStatus);
-      res.json({ success: true });
-    } catch (error) {
-      console.error("❌ Gửi thông báo thất bại:", error);
-      res.status(500).json({ error: "Không gửi được thông báo" });
+  try {
+    const [rows] = await db.query("SELECT * FROM donhang WHERE madonhang = ?", [madonhang]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "❌ Đơn hàng không tồn tại" });
     }
-  });
+
+    // Cập nhật trạng thái đơn hàng trong DB
+    await db.query("UPDATE donhang SET trangthai = ? WHERE madonhang = ?", [newStatus, madonhang]);
+
+    // Gửi thông báo FCM
+    await sendOrderStatusChangedNotification(deviceToken, newStatus, madonhang);
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error("❌ Gửi thông báo thất bại:", error);
+    res.status(500).json({ error: "Không gửi được thông báo" });
+  }
+});
 
   // Gắn các router phụ
   app.use('/api/employees', employeeRoutes);

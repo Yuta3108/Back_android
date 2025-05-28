@@ -24,7 +24,7 @@ function sendOrderStatusChangedNotification(token, status) {
   const statusMessages = {
     choxuly: "Đơn hàng của bạn đang chờ xử lý.",
     dangxuly: "Đơn hàng của bạn đang được xử lý.",
-    hoantat: "Đơn hàng của bạn đã hoàn tất. Cảm ơn bạn!",
+    hoantat: "Đơn hàng của bạn đã hoàn tất. Cảm ơn bạn! Vui Lòng Chờ bạn Nhé ",
     dahuy: "Đơn hàng của bạn đã bị hủy.",
   };
 
