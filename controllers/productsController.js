@@ -297,3 +297,40 @@ exports.updateProductWithSizes = (req, res) => {
         });
     });
 };
+
+// Xoá sản phẩm theo ID, kèm xoá size và giá theo size
+exports.deleteProductWithSizes = (req, res) => {
+    const { id } = req.params;
+
+    if (!id) {
+        return res.status(400).json({ message: 'Thiếu ID sản phẩm cần xoá' });
+    }
+
+    // Bước 1: Xoá bảng giasize → sizeproduct → products (đúng thứ tự khoá ngoại)
+    const deleteGiaSizeSQL = `DELETE FROM giasize WHERE masanpham = ?`;
+    const deleteSizeProductSQL = `DELETE FROM sizeproduct WHERE masanpham = ?`;
+    const deleteProductSQL = `DELETE FROM products WHERE id = ?`;
+
+    db.query(deleteGiaSizeSQL, [id], (err1) => {
+        if (err1) {
+            console.error('❌ Lỗi khi xoá bảng giasize:', err1.message);
+            return res.status(500).json({ message: 'Lỗi khi xoá giá theo size' });
+        }
+
+        db.query(deleteSizeProductSQL, [id], (err2) => {
+            if (err2) {
+                console.error('❌ Lỗi khi xoá bảng sizeproduct:', err2.message);
+                return res.status(500).json({ message: 'Lỗi khi xoá size sản phẩm' });
+            }
+
+            db.query(deleteProductSQL, [id], (err3) => {
+                if (err3) {
+                    console.error('❌ Lỗi khi xoá bảng products:', err3.message);
+                    return res.status(500).json({ message: 'Lỗi khi xoá sản phẩm chính' });
+                }
+
+                return res.status(200).json({ message: 'Đã xoá sản phẩm và các size/giá liên quan thành công' });
+            });
+        });
+    });
+};

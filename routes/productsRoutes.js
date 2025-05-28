@@ -23,7 +23,7 @@ const upload = multer({ storage });
 router.get('/', productsController.getAllProducts);
 
 // Xoá sản phẩm theo id
-router.delete('/:id', productsController.deleteProduct);
+//router.delete('/:id', productsController.deleteProduct);
 
 // Cập nhật sản phẩm theo id
 //router.put('/:id', productsController.updateProduct);
@@ -41,5 +41,8 @@ router.post('/', productsController.addProductWithSizes);
 
 //Thêm 1 giá mới vào size của sản phẩm đã có sẵn 
 router.post('/:id/add-size', productsController.addSizeToExistingProduct);
+
+//Xóa sản phẩm theo id, kèm xóa size và giá size theo size
+router.delete('/:id', productsController.deleteProductWithSizes);
 
 module.exports = router;

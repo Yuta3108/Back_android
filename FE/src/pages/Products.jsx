@@ -104,6 +104,20 @@ export default function Products() {
                 alert("Thêm size thất bại!");
             });
     };
+    const handleDeleteProduct = (productId) => {
+        if (!window.confirm("Bạn có chắc chắn muốn xoá sản phẩm này không?")) return;
+
+        axios.delete(`http://localhost:5000/api/products/${productId}`)
+            .then(() => {
+                alert("Đã xoá sản phẩm thành công!");
+                fetchProducts(); // reload lại danh sách sau khi xoá
+            })
+            .catch(err => {
+                console.error("Lỗi khi xoá sản phẩm:", err.message);
+                alert("Xoá sản phẩm thất bại!");
+            });
+    };
+
     const handleDeleteSize = (masize) => {
         if (!window.confirm("Bạn có chắc chắn muốn xoá size này không?")) return;
         axios.delete(`http://localhost:5000/api/size/${masize}`)
@@ -229,6 +243,7 @@ export default function Products() {
                 </button>
 
             </div>
+
             {/* Modal Thêm Sản Phẩm */}
             {showAddModal && (
                 <div className="bg-white shadow-md border rounded-lg p-4 mb-6 w-full max-w-2xl text-left">
@@ -593,7 +608,13 @@ export default function Products() {
                                 >
                                     Sửa
                                 </button>
-                                <button className="px-2 py-1 bg-[#d4795b] text-white rounded hover:bg-[#bd644a]">Xoá</button>
+                                <button
+                                    onClick={() => handleDeleteProduct(product.id)}
+                                    className="px-2 py-1 bg-[#d4795b] text-white rounded hover:bg-[#bd644a]"
+                                >
+                                    Xoá
+                                </button>
+
                             </td>
                         </tr>
                     ))}
