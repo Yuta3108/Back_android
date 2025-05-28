@@ -49,33 +49,33 @@ exports.deleteProduct = (req, res) => {
 };
 
 //Update sản phẩm theo id
-exports.updateProduct = (req, res) => {
-    const productId = req.params.id;
-    const { name, price, category_id, img } = req.body;
+// exports.updateProduct = (req, res) => {
+//     const productId = req.params.id;
+//     const { name, price, category_id, img } = req.body;
 
-    if (!name || !price || !category_id) {
-        return res.status(400).json({ message: 'Vui lòng nhập đầy đủ thông tin cần cập nhật' });
-    }
+//     if (!name || !price || !category_id) {
+//         return res.status(400).json({ message: 'Vui lòng nhập đầy đủ thông tin cần cập nhật' });
+//     }
 
-    const sql = `
-        UPDATE products 
-        SET name = ?, price = ?, category_id = ?, img = ?
-        WHERE id = ?
-    `;
+//     const sql = `
+//         UPDATE products 
+//         SET name = ?, price = ?, category_id = ?, img = ?
+//         WHERE id = ?
+//     `;
 
-    db.query(sql, [name, price, category_id, img || null, productId], (err, result) => {
-        if (err) {
-            console.error(' Lỗi cập nhật sản phẩm:', err);
-            return res.status(500).json({ message: 'Lỗi server khi cập nhật sản phẩm' });
-        }
+//     db.query(sql, [name, price, category_id, img || null, productId], (err, result) => {
+//         if (err) {
+//             console.error(' Lỗi cập nhật sản phẩm:', err);
+//             return res.status(500).json({ message: 'Lỗi server khi cập nhật sản phẩm' });
+//         }
 
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ message: 'Không tìm thấy sản phẩm để cập nhật' });
-        }
+//         if (result.affectedRows === 0) {
+//             return res.status(404).json({ message: 'Không tìm thấy sản phẩm để cập nhật' });
+//         }
 
-        res.json({ message: ' Cập nhật sản phẩm thành công!' });
-    });
-};
+//         res.json({ message: ' Cập nhật sản phẩm thành công!' });
+//     });
+// };
 
 // 📊 Thống kê sản phẩm
 exports.getProductStats = (req, res) => {
@@ -204,8 +204,8 @@ exports.addProductWithSizes = (req, res) => {
         });
     });
 };
-//API thêm 1 giá mới cho 1 size của 1 sản phẩm đã có sẵn  
 
+//API thêm 1 giá mới cho 1 size của 1 sản phẩm đã có sẵn  
 exports.addSizeToExistingProduct = (req, res) => {
     const { masize, gia } = req.body;
     const masanpham = req.params.id;
@@ -235,3 +235,65 @@ exports.addSizeToExistingProduct = (req, res) => {
     });
 };
 
+
+// API cập nhật sản phẩm kèm size và giá theo size
+exports.updateProductWithSizes = (req, res) => {
+    const { name, category_id, sizes } = req.body;
+    const { id } = req.params;
+
+    let sizesParsed;
+    try {
+        sizesParsed = typeof sizes === 'string' ? JSON.parse(sizes) : sizes;
+    } catch (error) {
+        console.error("❌ Lỗi parse JSON 'sizes':", error.message);
+        return res.status(400).json({ message: 'Dữ liệu size không hợp lệ' });
+    }
+
+
+    if (!name || !category_id || !sizesParsed || !Array.isArray(sizesParsed)) {
+        return res.status(400).json({ message: 'Vui lòng nhập đầy đủ thông tin cần cập nhật' });
+    }
+
+    const updateProductSQL = `UPDATE products SET name = ?, category_id = ? WHERE id = ?`;
+
+    db.query(updateProductSQL, [name, category_id, id], (err1) => {
+        if (err1) {
+            console.error("Lỗi khi cập nhật sản phẩm:", err1.message);
+            return res.status(500).json({ message: 'Lỗi khi cập nhật sản phẩm' });
+        }
+
+        const masizeList = sizesParsed.map(s => s.masize);
+        if (masizeList.length === 0) {
+            return res.status(400).json({ message: 'Danh sách size trống' });
+        }
+
+        // Phải xóa bảng giasize trước, rồi mới xóa bảng sizeproduct
+        const deleteGiaSizeSQL = `DELETE FROM giasize WHERE masanpham = ?`;
+        const deleteSizeProductSQL = `DELETE FROM sizeproduct WHERE masanpham = ?`;
+
+        db.query(deleteGiaSizeSQL, [id], (err2) => {
+            if (err2) return res.status(500).json({ message: 'Lỗi khi xoá giá size cũ' });
+
+            db.query(deleteSizeProductSQL, [id], (err3) => {
+                if (err3) return res.status(500).json({ message: 'Lỗi khi xoá size sản phẩm cũ' });
+
+                // Thêm size và giá mới
+                const sizeproductValues = sizesParsed.map(s => [id, s.masize]);
+                const giasizeValues = sizesParsed.map(s => [id, s.masize, s.gia]);
+
+                const insertSizeSQL = `INSERT INTO sizeproduct (masanpham, masize) VALUES ?`;
+                const insertGiaSQL = `INSERT INTO giasize (masanpham, masize, gia) VALUES ?`;
+
+                db.query(insertSizeSQL, [sizeproductValues], (err4) => {
+                    if (err4) return res.status(500).json({ message: 'Lỗi khi thêm size mới' });
+
+                    db.query(insertGiaSQL, [giasizeValues], (err5) => {
+                        if (err5) return res.status(500).json({ message: 'Lỗi khi thêm giá size mới' });
+
+                        return res.status(200).json({ message: 'Cập nhật sản phẩm thành công' });
+                    });
+                });
+            });
+        });
+    });
+};

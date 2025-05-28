@@ -26,8 +26,10 @@ router.get('/', productsController.getAllProducts);
 router.delete('/:id', productsController.deleteProduct);
 
 // Cập nhật sản phẩm theo id
-router.put('/:id', productsController.updateProduct);
+//router.put('/:id', productsController.updateProduct);
 
+// Cập nhật sản phẩm theo id
+router.put('/up/:id', productsController.updateProductWithSizes);
 // API thống kê sản phẩm
 router.get('/stats', productsController.getProductStats);
 
