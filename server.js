@@ -133,7 +133,7 @@ app.use('/img', express.static('img'));
     res.json({ success: true });
   } catch (error) {
     console.error("❌ Gửi thông báo thất bại:", error);
-    res.status(500).json({ error: "Không gửi được thông báo" });
+    res.status(500).json({ error: "Không gửi được thông báoa" });
   }
 });
 
