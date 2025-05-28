@@ -76,8 +76,9 @@ export default function OrderStatus() {
                         </tr>
                     </thead>
                     <tbody>
-                        {orders.map((order, orderIndex) => (
-                            order.chitiet.map((item, itemIndex) => (
+                        {orders.map((order) =>
+                             Array.isArray(order.chitiet) &&
+                                    order.chitiet.map((item, itemIndex) => (
                                 <tr key={`${order.madonhang}-${itemIndex}`} className="border-b hover:bg-[#fefaf4] transition">
                                     {/* Chỉ render các cột đơn hàng ở dòng đầu tiên của mỗi đơn */}
                                     {itemIndex === 0 && (
@@ -113,7 +114,7 @@ export default function OrderStatus() {
                                     )}
                                 </tr>
                             ))
-                        ))}
+                        )}
                     </tbody>
 
 
