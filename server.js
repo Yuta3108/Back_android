@@ -1,8 +1,13 @@
 require("dotenv").config({ path: "./.env" });
 const express = require("express");
-const mysql = require("mysql2");
+const mysql = require("mysql2/promise");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
+const {
+  sendOrderPlacedNotification,
+  sendOrderStatusChangedNotification,
+} = require("./ThongBao");
+
 const employeeRoutes = require('./routes/employeeRoutes');
 const productRoutes = require('./routes/productsRoutes');
 const categoryRoutes = require('./routes/categoriesRoutes');
@@ -10,110 +15,127 @@ const ordersRoutes = require('./routes/ordersRoutes');
 const orderDetailsRoutes = require('./routes/orderDetailsRoutes');
 const sizeRoutes = require('./routes/sizesanphamRoutes');
 const usersRoutes = require('./routes/usersRoutes');
+
 const app = express();
 app.use(express.json());
 app.use(cors());
+app.use(express.urlencoded({ extended: true }));
+app.use('/img', express.static('img'));
 
-//  Kết nối MySQL
-const db = mysql.createConnection({
+// Tạo IIFE để dùng async/await
+(async () => {
+  const db = await mysql.createConnection({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME
-});
+    database: process.env.DB_NAME,
+  });
 
-db.connect(err => {
-    if (err) {
-        console.error(" Lỗi kết nối MySQL:", err);
-        process.exit(1);
-    } else {
-        console.log(" Kết nối MySQL thành công!");
-    }
-});
+  console.log("✅ Kết nối MySQL thành công!");
 
-//  API Đăng ký tài khoản (Không mã hóa mật khẩu)
-app.post("/register", (req, res) => {
+  // Đăng ký tài khoản
+  app.post("/register", async (req, res) => {
     const { email, password, name, phone, address } = req.body;
-
-    // Kiểm tra đầu vào
     if (!email || !password || !name || !phone || !address) {
-        return res.status(400).json({ msg: "Vui lòng nhập đầy đủ thông tin!" });
+      return res.status(400).json({ msg: "Vui lòng nhập đầy đủ thông tin!" });
     }
 
-    const query = `
-        INSERT INTO users (email, password, name, phone, address)
-        VALUES (?, ?, ?, ?, ?)
-    `;
-    db.query(
-        query,
-        [email.toLowerCase(), password, name, phone, address],
-        (err, result) => {
-            if (err) {
-                console.error(" Lỗi đăng ký:", err);
-                return res.status(400).json({ msg: "Email đã tồn tại hoặc lỗi hệ thống!" });
-            }
-            res.status(201).json({ msg: "Đăng ký thành công!" });
-        }
-    );
-});
-app.use(express.json());  //  Đảm bảo đọc được JSON
-app.use(express.urlencoded({ extended: true }));  //  Đọc dữ liệu từ form
+    try {
+      await db.query(
+        `INSERT INTO users (email, password, name, phone, address) VALUES (?, ?, ?, ?, ?)`,
+        [email.toLowerCase(), password, name, phone, address]
+      );
+      res.status(201).json({ msg: "Đăng ký thành công!" });
+    } catch (err) {
+      console.error("❌ Lỗi đăng ký:", err);
+      res.status(400).json({ msg: "Email đã tồn tại hoặc lỗi hệ thống!" });
+    }
+  });
 
-
-//  API Đăng nhập (Không kiểm tra mã hóa)
-app.post("/api/login", (req, res) => {
-    console.log("📥 Dữ liệu nhận được từ client:", req.body);
-
+  // Đăng nhập
+  app.post("/api/login", async (req, res) => {
     const { email, password } = req.body;
-
     if (!email || !password) {
-        return res.status(400).json({ message: "Vui lòng nhập email và mật khẩu!" });
+      return res.status(400).json({ message: "Vui lòng nhập email và mật khẩu!" });
     }
 
-    const query = "SELECT id, email, password FROM users WHERE LOWER(email) = LOWER(?)";
+    try {
+      const [results] = await db.query(
+        "SELECT id, email, password FROM users WHERE LOWER(email) = LOWER(?)",
+        [email]
+      );
 
-    db.query(query, [email], (err, results) => {
-        if (err) {
-            console.error(" Lỗi truy vấn MySQL:", err);
-            return res.status(500).json({ error: "Lỗi server" });
-        }
+      if (results.length === 0) {
+        return res.status(401).json({ message: "Email không tồn tại!" });
+      }
 
-        if (results.length === 0) {
-            return res.status(401).json({ message: "Email không tồn tại!" });
-        }
+      const user = results[0];
+      if (password !== user.password) {
+        return res.status(401).json({ message: "Sai mật khẩu!" });
+      }
 
-        const user = results[0];
+      const token = jwt.sign(
+        { id: user.id, email: user.email },
+        process.env.JWT_SECRET,
+        { expiresIn: "1h" }
+      );
 
-        if (password !== user.password) {
-            return res.status(401).json({ message: "Sai mật khẩu!" });
-        }
+      res.json({ message: "Đăng nhập thành công!", token, userId: user.id });
+    } catch (err) {
+      console.error("❌ Lỗi đăng nhập:", err);
+      res.status(500).json({ error: "Lỗi server" });
+    }
+  });
 
-        const token = jwt.sign(
-            { id: user.id, email: user.email },
-            process.env.JWT_SECRET,
-            { expiresIn: "1h" }
-        );
+  // Lưu device token
+  app.post("/api/user/device-token", async (req, res) => {
+    const { userId, deviceToken } = req.body;
+    try {
+      await db.query("UPDATE users SET device_token = ? WHERE id = ?", [deviceToken, userId]);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("❌ Lỗi khi lưu device token:", error);
+      res.status(500).json({ success: false, message: "Không thể lưu device token" });
+    }
+  });
+   app.post("/api/send-order-notification", async (req, res) => {
+    const { deviceToken } = req.body;
 
-        res.json({ message: "Đăng nhập thành công!", token, userId: user.id });
+    if (!deviceToken) {
+        return res.status(400).json({ message: "Thiếu deviceToken" });
+    }
+
+    try {
+        await sendOrderPlacedNotification(deviceToken);
+        res.status(200).json({ message: "Đã gửi thông báo đặt hàng thành công" });
+    } catch (err) {
+        console.error("❌ Gửi thông báo thất bại:", err);
+        res.status(500).json({ message: "Lỗi khi gửi thông báo" });
+    }
     });
+  // Gửi thông báo cập nhật trạng thái đơn hàng
+  app.put("/order/:id/status", async (req, res) => {
+    const madonhang = req.params.id;
+    const { newStatus, deviceToken } = req.body;
 
-});
-//api nhân viên
-app.use('/api/employees', employeeRoutes);
-//api sản phẩm
-app.use('/api/products', productRoutes);
-//api danh mục sản phẩm
-app.use('/api/categories', categoryRoutes);
-//api đơn hàng
-app.use('/api/orders', ordersRoutes);
-//api chi tiết đơn hàng
-app.use('/api/order-details', orderDetailsRoutes);
-//api size sản phẩm
-app.use('/api/size', sizeRoutes);
-//api của users
-app.use('/api', usersRoutes);
-// Cho phép truy cập ảnh từ thư mục img/
-app.use('/img', express.static('img'));
-//  Chạy server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(` Server chạy trên cổng ${PORT}`));
+    try {
+      await sendOrderStatusChangedNotification(deviceToken, newStatus);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("❌ Gửi thông báo thất bại:", error);
+      res.status(500).json({ error: "Không gửi được thông báo" });
+    }
+  });
+
+  // Gắn các router phụ
+  app.use('/api/employees', employeeRoutes);
+  app.use('/api/products', productRoutes);
+  app.use('/api/categories', categoryRoutes);
+  app.use('/api/orders', ordersRoutes);
+  app.use('/api/order-details', orderDetailsRoutes);
+  app.use('/api/size', sizeRoutes);
+  app.use('/api', usersRoutes);
+
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => console.log(`🚀 Server chạy trên cổng ${PORT}`));
+})();

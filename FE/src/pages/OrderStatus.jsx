@@ -55,7 +55,7 @@ export default function OrderStatus() {
 
             <div className="max-w-6xl mx-auto overflow-x-auto rounded-lg shadow">
                 <table className="min-w-full bg-white border text-sm">
-                    <thead className="bg-[#a37c5d] text-white">
+                    <thead className="bg-[#7b4f27] text-[#fdfaf6]">
                         <tr>
                             {[
                                 "Mã đơn",

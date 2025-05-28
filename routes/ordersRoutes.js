@@ -20,5 +20,8 @@ router.get('/stats', ordersController.getOrderStats);
 // Lấy tất cả đơn hàng (không lọc theo user)
 router.get('/all', ordersController.getAllOrders);
 
+//Lấy đơn hàng và chi tiết đơn hàng
+router.get('/:userId', ordersController.getOrdersByUser);
+
 module.exports = router;
 

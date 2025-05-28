@@ -37,4 +37,7 @@ router.get('/products-with-sizes', productsController.getProductListWithSizes);
 // ✅ Thêm sản phẩm mới (gồm size, giá — KHÔNG CÒN upload ảnh)
 router.post('/', productsController.addProductWithSizes);
 
+//Thêm 1 giá mới vào size của sản phẩm đã có sẵn 
+router.post('/:id/add-size', productsController.addSizeToExistingProduct);
+
 module.exports = router;
