@@ -1,46 +1,12 @@
-// import { Link, useLocation } from 'react-router-dom';
-
-// const menuItems = [
-//     { to: '/', label: '🏠 Trang chính' },
-//     { to: '/employees', label: '👥 Quản lý Nhân viên' },
-//     { to: '/products', label: '🛒 Quản lý Sản phẩm' },
-// ];
-
-// export default function Sidebar() {
-//     const location = useLocation();
-
-//     return (
-//         <div className="w-64 h-screen bg-[#5c3d2e] text-white px-6 py-10 shadow-lg">
-//             <h1 className="text-4xl font-extrabold mb-10 text-[#fef3e7] tracking-wide text-center">
-//                 Cafe Admin
-//             </h1>
-//             <ul className="space-y-4 list-none p-0 m-0">
-//                 {menuItems.map(({ to, label }) => (
-//                     <li key={to}>
-//                         <Link
-//                             to={to}
-//                             className={`block text-lg font-semibold px-4 py-3 rounded-lg transition-all ${location.pathname === to
-//                                 ? 'bg-[#a1866f] text-white'
-//                                 : 'hover:bg-[#7a5b4a] text-[#f3e9e3]'
-//                                 }`}
-//                         >
-//                             {label}
-//                         </Link>
-//                     </li>
-//                 ))}
-//             </ul>
-//         </div>
-//     );
-// }
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 const menuItems = [
-    { to: '/', label: '🏠 Trang chính' },
-    { to: '/employees', label: '👥 Quản lý Nhân viên' },
-    { to: '/products', label: '🛒 Quản lý Sản phẩm' },
-    { to: '/order-status', label: '📦 Quản lý Trạng thái Đơn hàng' },
-    { to: '/users', label: '👥 Quản lý Khách hàng' },
+    { to: '/', label: 'Trang chính' },
+    { to: '/employees', label: 'Quản lý Nhân viên' },
+    { to: '/products', label: 'Quản lý Sản phẩm' },
+    { to: '/order-status', label: 'Quản lý Trạng thái Đơn hàng' },
+    { to: '/users', label: 'Quản lý Khách hàng' },
 ];
 
 export default function Sidebar() {
@@ -49,9 +15,9 @@ export default function Sidebar() {
 
     return (
         <>
-            {/* Nút toggle cho mobile */}
+            {/* Nút toggle mobile */}
             <button
-                className="md:hidden fixed top-4 left-4 z-50 bg-[#fdfaf6] text-white p-2 rounded-lg"
+                className="md:hidden fixed top-4 left-4 z-50 bg-[#d4a373] text-white p-2 rounded-md shadow-lg"
                 onClick={() => setIsOpen(!isOpen)}
             >
                 ☰
@@ -59,27 +25,33 @@ export default function Sidebar() {
 
             {/* Sidebar */}
             <div
-                className={`fixed z-40 top-0 left-0 h-full w-64 bg-[#5c3d2e] text-white py-10 shadow-lg transform transition-transform duration-300
-  ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 md:static md:block`}
+                className={`fixed z-40 top-0 left-0 h-full w-64 bg-[#fdf6f0] text-[#4e2d1e] py-10 px-4 border border-[#e6d2b2] shadow-xl 
+                transform transition-transform duration-300
+                ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 md:static md:block`}
             >
-                <h1 className="text-4xl font-extrabold mb-10 text-[#fef3e7] tracking-wide text-center">
-                    Cafe Admin
+                <h1 className="text-3xl font-bold mb-10 text-center tracking-wide text-[#4e2d1e]">
+                    ☕ Cafe Admin
                 </h1>
-                <ul className="space-y-4 list-none p-0 m-0">
-                    {menuItems.map(({ to, label }) => (
-                        <li key={to}>
-                            <Link
-                                to={to}
-                                onClick={() => setIsOpen(false)} // auto close khi chọn
-                                className={`block text-lg font-semibold px-4 py-3 rounded-lg transition-all ${location.pathname === to
-                                    ? 'bg-[#a1866f] text-white'
-                                    : 'hover:bg-[#7a5b4a] text-[#f3e9e3]'
-                                    }`}
-                            >
-                                {label}
-                            </Link>
-                        </li>
-                    ))}
+
+                <ul className="space-y-2">
+                    {menuItems.map(({ to, label }) => {
+                        const isActive = location.pathname === to;
+                        return (
+                            <li key={to}>
+                                <Link
+                                    to={to}
+                                    onClick={() => setIsOpen(false)}
+                                    className={`block px-4 py-3 rounded-lg text-base font-medium tracking-wide transition-all duration-200 shadow-sm
+                                        ${isActive
+                                            ? 'bg-[#d4a373] text-white shadow-md'
+                                            : 'hover:bg-[#f0e1cf] hover:text-[#4e2d1e] text-[#7a5c3d]'
+                                        }`}
+                                >
+                                    {label}
+                                </Link>
+                            </li>
+                        );
+                    })}
                 </ul>
             </div>
         </>

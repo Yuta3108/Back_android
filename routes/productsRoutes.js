@@ -45,4 +45,6 @@ router.post('/:id/add-size', productsController.addSizeToExistingProduct);
 //Xóa sản phẩm theo id, kèm xóa size và giá size theo size
 router.delete('/:id', productsController.deleteProductWithSizes);
 
+
+
 module.exports = router;

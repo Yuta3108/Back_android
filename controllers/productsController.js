@@ -334,3 +334,43 @@ exports.deleteProductWithSizes = (req, res) => {
         });
     });
 };
+
+// API xoá 1 size khỏi sản phẩm
+exports.deleteSizeFromProduct = (req, res) => {
+    const { productId, sizeId } = req.params;
+
+    // B1: Tìm sizeproduct cần xoá
+    const findSizeProduct = `SELECT masizeproduct FROM sizeproduct WHERE masanpham = ? AND masize = ?`;
+    db.query(findSizeProduct, [productId, sizeId], (err1, result1) => {
+        if (err1) {
+            console.error('Lỗi truy vấn sizeproduct:', err1);
+            return res.status(500).json({ message: 'Lỗi truy vấn sizeproduct' });
+        }
+
+        if (result1.length === 0) {
+            return res.status(404).json({ message: 'Không tìm thấy size này trong sản phẩm' });
+        }
+
+        const sizeProductId = result1[0].masizeproduct;
+
+        // B2: Xoá giá trong bảng giasize
+        const deleteGia = `DELETE FROM giasize WHERE sizeproduct_id = ?`;
+        db.query(deleteGia, [sizeProductId], (err2) => {
+            if (err2) {
+                console.error('Lỗi xoá giasize:', err2);
+                return res.status(500).json({ message: 'Lỗi xoá giá size' });
+            }
+
+            // B3: Xoá dòng trong bảng sizeproduct
+            const deleteSizeProduct = `DELETE FROM sizeproduct WHERE masizeproduct = ?`;
+            db.query(deleteSizeProduct, [sizeProductId], (err3) => {
+                if (err3) {
+                    console.error('Lỗi xoá sizeproduct:', err3);
+                    return res.status(500).json({ message: 'Lỗi xoá size khỏi sản phẩm' });
+                }
+
+                return res.json({ message: 'Xoá size khỏi sản phẩm thành công' });
+            });
+        });
+    });
+};

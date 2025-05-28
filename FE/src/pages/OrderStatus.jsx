@@ -13,7 +13,7 @@ export default function OrderStatus() {
 
     const fetchOrders = async () => {
         try {
-            const res = await axios.get("http://localhost:5000/api/orders/all"); // <-- sửa lại nếu API này trả về danh sách
+            const res = await axios.get("http://localhost:5000/api/orders/all");
             setOrders(res.data);
         } catch (err) {
             console.error("Lỗi khi lấy đơn hàng:", err);
@@ -28,7 +28,7 @@ export default function OrderStatus() {
     const handleUpdate = async () => {
         try {
             await axios.put(
-                `http://localhost:5000/api/orders/${editingOrder.madonhang}/status`, // <-- CHỖ NÀY SỬA LẠI
+                `http://localhost:5000/api/orders/${editingOrder.madonhang}/status`,
                 { trangthai: newStatus }
             );
             setEditingOrder(null);
@@ -53,9 +53,9 @@ export default function OrderStatus() {
                 </p>
             </div>
 
-            <div className="max-w-6xl mx-auto overflow-x-auto rounded-lg shadow">
-                <table className="min-w-full bg-white border text-sm">
-                    <thead className="bg-[#7b4f27] text-[#fdfaf6]">
+            <div className="max-w-6xl mx-auto overflow-x-auto rounded-xl shadow border border-[#e5dacd]">
+                <table className="min-w-full bg-white border border-[#e5dacd] text-sm">
+                    <thead className="bg-[#D2B48C] text-white text-center">
                         <tr>
                             {[
                                 "Mã đơn",
@@ -69,7 +69,7 @@ export default function OrderStatus() {
                                 "Sản phẩm",
                                 "Hành động",
                             ].map((h, i) => (
-                                <th key={i} className="px-4 py-2 text-left">
+                                <th key={i} className="px-4 py-3 border border-[#e5dacd]">
                                     {h}
                                 </th>
                             ))}
@@ -77,36 +77,33 @@ export default function OrderStatus() {
                     </thead>
                     <tbody>
                         {orders.map((order) =>
-                             Array.isArray(order.chitiet) &&
-                                    order.chitiet.map((item, itemIndex) => (
-                                <tr key={`${order.madonhang}-${itemIndex}`} className="border-b hover:bg-[#fefaf4] transition">
-                                    {/* Chỉ render các cột đơn hàng ở dòng đầu tiên của mỗi đơn */}
+                            Array.isArray(order.chitiet) &&
+                            order.chitiet.map((item, itemIndex) => (
+                                <tr key={`${order.madonhang}-${itemIndex}`} className="border-b border-[#eee1d6] hover:bg-[#fcf7f2] transition text-center">
                                     {itemIndex === 0 && (
                                         <>
-                                            <td rowSpan={order.chitiet.length} className="px-4 py-2 text-center">{order.madonhang}</td>
-                                            <td rowSpan={order.chitiet.length} className="px-4 py-2 text-center">
+                                            <td rowSpan={order.chitiet.length} className="px-4 py-3 border border-[#e5dacd]">{order.madonhang}</td>
+                                            <td rowSpan={order.chitiet.length} className="px-4 py-3 border border-[#e5dacd]">
                                                 {new Date(order.ngaydat).toLocaleDateString()}
                                             </td>
-                                            <td rowSpan={order.chitiet.length} className="px-4 py-2 text-right">
+                                            <td rowSpan={order.chitiet.length} className="px-4 py-3 border border-[#e5dacd] ">
                                                 {order.tongtien.toLocaleString()} đ
                                             </td>
-                                            <td rowSpan={order.chitiet.length} className="px-4 py-2 capitalize text-center">{order.trangthai}</td>
-                                            <td rowSpan={order.chitiet.length} className="px-4 py-2 text-left">{order.ghichu}</td>
-                                            <td rowSpan={order.chitiet.length} className="px-4 py-2 text-center">{order.phuongthucthanhtoan}</td>
+                                            <td rowSpan={order.chitiet.length} className="px-4 py-3 border border-[#e5dacd] capitalize">{order.trangthai}</td>
+                                            <td rowSpan={order.chitiet.length} className="px-4 py-3 border border-[#e5dacd] ">{order.ghichu}</td>
+                                            <td rowSpan={order.chitiet.length} className="px-4 py-3 border border-[#e5dacd]">{order.phuongthucthanhtoan}</td>
                                         </>
                                     )}
 
-                                    {/* Luôn hiển thị các cột chi tiết sản phẩm */}
-                                    <td className="px-4 py-2 text-center">{item.soluong}</td>
-                                    <td className="px-4 py-2 text-center">{order.user.name}</td>
-                                    <td className="px-4 py-2 text-left">{item.ten_san_pham}</td>
+                                    <td className="px-4 py-3 border border-[#e5dacd]">{item.soluong}</td>
+                                    <td className="px-4 py-3 border border-[#e5dacd]">{order.user.name}</td>
+                                    <td className="px-4 py-3 border border-[#e5dacd] ">{item.ten_san_pham}</td>
 
-                                    {/* Chỉ hiển thị nút sửa 1 lần cho mỗi đơn */}
                                     {itemIndex === 0 && (
-                                        <td rowSpan={order.chitiet.length} className="px-4 py-2 text-center">
+                                        <td rowSpan={order.chitiet.length} className="px-4 py-3 border border-[#e5dacd]">
                                             <button
                                                 onClick={() => handleEdit(order)}
-                                                className="px-2 py-1 bg-[#c2a28b] rounded hover:bg-[#b3907c]"
+                                                className="bg-[#c2a28b] text-white px-4 py-1 rounded-full text-sm hover:bg-[#a9836b]"
                                             >
                                                 Sửa
                                             </button>
@@ -116,27 +113,25 @@ export default function OrderStatus() {
                             ))
                         )}
                     </tbody>
-
-
                 </table>
             </div>
 
             {editingOrder && (
                 <div className="mt-8 flex justify-center">
-                    <div className="w-full max-w-md mx-auto bg-[#f9f4ef] rounded-xl shadow p-5 border border-[#e1d4c7]">
-                        <h3 className="text-base sm:text-lg font-semibold text-center mb-4 text-[#5b3b2e]">
+                    <div className="w-full max-w-md bg-white rounded-2xl shadow-lg border border-[#e5dacd] p-6">
+                        <h3 className="text-lg font-semibold text-center mb-4 text-[#5b3b2e]">
                             🛠️ Sửa trạng thái đơn #{editingOrder.madonhang}
                         </h3>
 
                         <div className="mb-4 text-left">
-                            <label htmlFor="status" className="block text-sm mb-1 text-[#5b3b2e] font-medium">
+                            <label htmlFor="status" className="block text-sm font-medium text-[#5b3b2e] mb-1">
                                 Trạng thái:
                             </label>
                             <select
                                 id="status"
                                 value={newStatus}
                                 onChange={(e) => setNewStatus(e.target.value)}
-                                className="w-full border border-gray-300 rounded px-3 py-2 text-sm text-[#4b2e2e] focus:outline-none focus:ring-2 focus:ring-[#a37c5d]"
+                                className="w-full border border-[#d8c7b5] rounded-lg px-3 py-2 text-sm text-[#4b2e2e] bg-[#fcf9f5] focus:outline-none focus:ring-2 focus:ring-[#a37c5d]"
                             >
                                 <option value="choxuly">Chờ xử lý</option>
                                 <option value="danggiao">Đang giao</option>
@@ -148,13 +143,13 @@ export default function OrderStatus() {
                         <div className="flex justify-end gap-3">
                             <button
                                 onClick={handleCancel}
-                                className="bg-gray-200 text-gray-800 px-4 py-2 text-sm rounded hover:bg-gray-300"
+                                className="px-4 py-2 text-sm text-[#5e3a1e] border border-[#a37c5d] rounded-full bg-white hover:bg-[#f5eadd]"
                             >
                                 Hủy
                             </button>
                             <button
                                 onClick={handleUpdate}
-                                className="bg-[#a37c5d] text-white px-4 py-2 text-sm rounded hover:bg-[#8b644a]"
+                                className="px-4 py-2 text-sm text-white bg-[#a37c5d] rounded-full hover:bg-[#8b644a]"
                             >
                                 Lưu
                             </button>

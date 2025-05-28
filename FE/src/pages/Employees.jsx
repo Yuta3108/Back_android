@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 
 export default function Employees() {
-    const [editingEmployee, setEditingEmployee] = useState(null); // Nhân viên đang sửa
-    const [showEditForm, setShowEditForm] = useState(false); // Hiện form sửa
+    const [editingEmployee, setEditingEmployee] = useState(null);
+    const [showEditForm, setShowEditForm] = useState(false);
     const [employees, setEmployees] = useState([]);
     const [showAddForm, setShowAddForm] = useState(false);
     const [newEmployee, setNewEmployee] = useState({
@@ -30,10 +30,10 @@ export default function Employees() {
         try {
             await axios.delete(`http://localhost:5000/api/employees/${id}`);
             setEmployees((prev) => prev.filter((e) => e.id !== id));
-            alert(" Xoá nhân viên thành công");
+            alert("Xoá nhân viên thành công");
         } catch (err) {
             console.error("Lỗi khi xoá nhân viên:", err);
-            alert(" Lỗi khi xoá nhân viên");
+            alert("Lỗi khi xoá nhân viên");
         }
     };
 
@@ -74,20 +74,20 @@ export default function Employees() {
             };
 
             setEmployees((prev) => [...prev, added]);
-            alert(" Thêm nhân viên thành công");
+            alert("Thêm nhân viên thành công");
 
-            // Reset form
             setNewEmployee({ name: "", email: "", position: "", salary: "" });
             setShowAddForm(false);
         } catch (err) {
             console.error("Lỗi khi thêm nhân viên:", err);
             if (err.response?.status === 409) {
-                alert(" Email đã tồn tại");
+                alert("Email đã tồn tại");
             } else {
-                alert(" Lỗi khi thêm nhân viên");
+                alert("Lỗi khi thêm nhân viên");
             }
         }
     };
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setNewEmployee((prev) => ({
@@ -95,6 +95,7 @@ export default function Employees() {
             [name]: value
         }));
     };
+
     const handleEdit = (id) => {
         const employee = employees.find((e) => e.id === id);
         if (employee) {
@@ -104,145 +105,57 @@ export default function Employees() {
     };
 
     return (
-        <div className="p-6 bg-[#fdfaf6] min-h-screen text-[#4b2e2e]">
-            <h2 className="text-3xl font-bold text-center mb-6">
+        <div className="p-8 bg-[#ffffff] min-h-screen text-[#5a3825] font-sans">
+            <h2 className="text-3xl font-bold text-center mb-10 text-[#5a3825]">
                 👥 Quản lý Nhân viên
             </h2>
 
-            {/* Nút thêm nhân viên */}
-            <div className="flex justify-center mb-4">
+            <div className="flex justify-center mb-6">
                 <button
                     onClick={handleAdd}
-                    className="bg-[#7a5b4a] hover:bg-[#5d4034] text-[#fdfaf6] font-medium py-2 px-4 rounded-lg transition"
+                    className="bg-[#a47148] text-white font-medium py-2 px-5 rounded-full hover:bg-[#8a5a35] transition"
                 >
                     ➕ Thêm nhân viên
                 </button>
             </div>
 
-            {/* Form thêm nhân viên */}
-            {showAddForm && (
-                <div className="max-w-md mx-auto bg-[#fff8f2] border border-[#e0cfc2] rounded-2xl shadow-md p-6 mb-8 text-[#4b2e2e]">
-                    <h3 className="text-lg font-semibold text-center mb-4 flex items-center justify-center gap-2">
-                        📝 Thêm nhân viên
+            {(showAddForm || (showEditForm && editingEmployee)) && (
+                <div className="max-w-md mx-auto bg-[#f5eade] border border-[#e0cdbf] rounded-2xl shadow-md p-6 mb-8">
+                    <h3 className="text-xl font-semibold text-center mb-4">
+                        {showAddForm ? "📝 Thêm nhân viên" : "🛠️ Sửa nhân viên"}
                     </h3>
-                    <form onSubmit={handleSubmitNewEmployee} className="space-y-3">
-                        <div>
-                            <label className="block text-sm mb-1">👤 Họ tên</label>
-                            <input
-                                type="text"
-                                name="name"
-                                value={newEmployee.name}
-                                onChange={handleChange}
-                                className="w-full px-3 py-2 border border-[#d2b9a3] rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#b18c7c]"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm mb-1">📧 Email</label>
-                            <input
-                                type="email"
-                                name="email"
-                                value={newEmployee.email}
-                                onChange={handleChange}
-                                className="w-full px-3 py-2 border border-[#d2b9a3] rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#b18c7c]"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm mb-1">🏷️ Chức vụ</label>
-                            <input
-                                type="text"
-                                name="position"
-                                value={newEmployee.position}
-                                onChange={handleChange}
-                                className="w-full px-3 py-2 border border-[#d2b9a3] rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#b18c7c]"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm mb-1">💰 Lương</label>
-                            <input
-                                type="number"
-                                name="salary"
-                                value={newEmployee.salary}
-                                onChange={handleChange}
-                                className="w-full px-3 py-2 border border-[#d2b9a3] rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#b18c7c]"
-                            />
-                        </div>
+                    <form onSubmit={showAddForm ? handleSubmitNewEmployee : handleSubmitEditEmployee} className="space-y-4">
+                        {['name', 'email', 'position', 'salary'].map((field) => (
+                            <div key={field}>
+                                <label className="block text-sm mb-1 text-[#5a3825] font-medium">
+                                    {field === 'name' ? '👤 Họ tên' :
+                                        field === 'email' ? '📧 Email' :
+                                            field === 'position' ? '🏷️ Chức vụ' : '💰 Lương'}
+                                </label>
+                                <input
+                                    type={field === 'email' ? 'email' : field === 'salary' ? 'number' : 'text'}
+                                    name={field}
+                                    value={showAddForm ? newEmployee[field] : editingEmployee[field]}
+                                    onChange={(e) => showAddForm
+                                        ? setNewEmployee((prev) => ({ ...prev, [field]: e.target.value }))
+                                        : setEditingEmployee((prev) => ({ ...prev, [field]: e.target.value }))
+                                    }
+                                    className="w-full px-4 py-2 bg-white border border-[#d4bfae] text-[#5a3825] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#a47148]"
+                                />
+                            </div>
+                        ))}
 
                         <div className="flex justify-between pt-4">
-                            <button
-                                type="submit"
-                                className="text-[#5d4034] text-sm hover:underline"
-                            >
-                                ✔️ Thêm
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setShowAddForm(false)}
-                                className="text-[#5d4034] text-sm hover:underline"
-                            >
-                                ✖️ Hủy
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            )}
-            {/* Form sửa nhân viên */}
-            {showEditForm && editingEmployee && (
-                <div className="max-w-md mx-auto bg-[#fff8f2] border border-[#e0cfc2] rounded-2xl shadow-md p-6 mb-8 text-[#4b2e2e]">
-                    <h3 className="text-lg font-semibold text-center mb-4 flex items-center justify-center gap-2">
-                        🛠️ Sửa nhân viên
-                    </h3>
-                    <form onSubmit={handleSubmitEditEmployee} className="space-y-3">
-                        <div>
-                            <label className="block text-sm mb-1">👤 Họ tên</label>
-                            <input
-                                type="text"
-                                name="name"
-                                value={editingEmployee.name}
-                                onChange={(e) => setEditingEmployee((prev) => ({ ...prev, name: e.target.value }))}
-                                className="w-full px-3 py-2 border border-[#d2b9a3] rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#b18c7c]"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm mb-1">📧 Email</label>
-                            <input
-                                type="email"
-                                name="email"
-                                value={editingEmployee.email}
-                                onChange={(e) => setEditingEmployee((prev) => ({ ...prev, email: e.target.value }))}
-                                className="w-full px-3 py-2 border border-[#d2b9a3] rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#b18c7c]"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm mb-1">🏷️ Chức vụ</label>
-                            <input
-                                type="text"
-                                name="position"
-                                value={editingEmployee.position}
-                                onChange={(e) => setEditingEmployee((prev) => ({ ...prev, position: e.target.value }))}
-                                className="w-full px-3 py-2 border border-[#d2b9a3] rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#b18c7c]"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm mb-1">💰 Lương</label>
-                            <input
-                                type="number"
-                                name="salary"
-                                value={editingEmployee.salary}
-                                onChange={(e) => setEditingEmployee((prev) => ({ ...prev, salary: e.target.value }))}
-                                className="w-full px-3 py-2 border border-[#d2b9a3] rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#b18c7c]"
-                            />
-                        </div>
-                        <div className="flex justify-between pt-4">
-                            <button type="submit" className="text-[#5d4034] text-sm hover:underline">
-                                ✔️ Cập nhật
+                            <button type="submit" className="text-[#a47148] hover:underline">
+                                ✔️ {showAddForm ? "Thêm" : "Cập nhật"}
                             </button>
                             <button
                                 type="button"
                                 onClick={() => {
-                                    setShowEditForm(false);
+                                    showAddForm ? setShowAddForm(false) : setShowEditForm(false);
                                     setEditingEmployee(null);
                                 }}
-                                className="text-[#5d4034] text-sm hover:underline"
+                                className="text-[#aaaaaa] hover:underline"
                             >
                                 ✖️ Hủy
                             </button>
@@ -251,50 +164,49 @@ export default function Employees() {
                 </div>
             )}
 
-            {/* Bảng danh sách nhân viên */}
-            <div className="overflow-x-auto rounded-lg shadow border border-[#ddd]">
-                <table className="min-w-max w-full text-sm bg-white border-collapse table-auto">
+            <div className="overflow-x-auto rounded-2xl shadow-md border border-[#e0cdbf]">
+                <table className="min-w-full text-sm bg-white text-black border border-[#ccc] table-auto rounded-lg overflow-hidden">
                     <thead>
-                        <tr className="bg-[#7a5b4a] text-[#fdfaf6]">
-                            <th className="px-4 py-3 text-left border-b border-white min-w-[80px]">ID</th>
-                            <th className="px-4 py-3 text-left border-b border-white min-w-[150px]">Họ tên</th>
-                            <th className="px-4 py-3 text-left border-b border-white min-w-[200px]">Email</th>
-                            <th className="px-4 py-3 text-left border-b border-white min-w-[130px]">Chức vụ</th>
-                            <th className="px-4 py-3 text-left border-b border-white min-w-[130px]">Lương</th>
-                            <th className="px-4 py-3 text-left border-b border-white min-w-[180px]">Ngày tạo</th>
-                            <th className="px-4 py-3 text-left border-b border-white min-w-[160px]">Hành động</th>
+                        <tr className="bg-[#D2B48C] text-black text-center">
+                            <th className="px-5 py-3 border border-[#ccc]">ID</th>
+                            <th className="px-5 py-3 border border-[#ccc]">Họ tên</th>
+                            <th className="px-5 py-3 border border-[#ccc]">Email</th>
+                            <th className="px-5 py-3 border border-[#ccc]">Chức vụ</th>
+                            <th className="px-5 py-3 border border-[#ccc]">Lương</th>
+                            <th className="px-5 py-3 border border-[#ccc]">Ngày tạo</th>
+                            <th className="px-5 py-3 border border-[#ccc]">Hành động</th>
                         </tr>
                     </thead>
                     <tbody>
                         {employees.length === 0 ? (
                             <tr>
-                                <td colSpan="7" className="text-center py-6 text-[#6e5345]">
+                                <td colSpan="7" className="text-center py-6 text-[#888] border border-[#ccc]">
                                     Không có nhân viên nào.
                                 </td>
                             </tr>
                         ) : (
                             employees.map((e) => (
-                                <tr key={e.id} className="border-t hover:bg-[#f9f3ed]">
-                                    <td className="px-4 py-3 border-b">{e.id}</td>
-                                    <td className="px-4 py-3 border-b">{e.name}</td>
-                                    <td className="px-4 py-3 border-b">{e.email}</td>
-                                    <td className="px-4 py-3 border-b">{e.position}</td>
-                                    <td className="px-4 py-3 border-b">
+                                <tr key={e.id} className="hover:bg-[#f8f5f0] text-center">
+                                    <td className="px-5 py-3 border border-[#ccc]">{e.id}</td>
+                                    <td className="px-5 py-3 border border-[#ccc]">{e.name}</td>
+                                    <td className="px-5 py-3 border border-[#ccc]">{e.email}</td>
+                                    <td className="px-5 py-3 border border-[#ccc]">{e.position}</td>
+                                    <td className="px-5 py-3 border border-[#ccc]">
                                         {Number(e.salary).toLocaleString("vi-VN")} ₫
                                     </td>
-                                    <td className="px-4 py-3 border-b">
+                                    <td className="px-5 py-3 border border-[#ccc]">
                                         {new Date(e.created_at).toLocaleString("vi-VN")}
                                     </td>
-                                    <td className="px-4 py-3 border-b space-x-2">
+                                    <td className="px-5 py-3 border border-[#ccc] space-x-2">
                                         <button
                                             onClick={() => handleEdit(e.id)}
-                                            className="mr-2 px-2 py-1 bg-[#c2a28b] rounded hover:bg-[#b3907c]"
+                                            className="px-3 py-1 bg-[#D2B48C] text-white rounded-full hover:bg-[#e0cdbf]"
                                         >
                                             Sửa
                                         </button>
                                         <button
                                             onClick={() => handleDelete(e.id)}
-                                            className="px-2 py-1 bg-[#d4795b] text-white rounded hover:bg-[#bd644a]"
+                                            className="px-3 py-1 bg-[#D2B48C] text-white rounded-full hover:bg-[#e0cdbf]"
                                         >
                                             Xóa
                                         </button>
@@ -304,6 +216,7 @@ export default function Employees() {
                         )}
                     </tbody>
                 </table>
+
             </div>
         </div>
     );
