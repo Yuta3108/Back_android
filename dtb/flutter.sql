@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1:3306
--- Thời gian đã tạo: Th5 28, 2025 lúc 05:26 AM
+-- Thời gian đã tạo: Th5 28, 2025 lúc 06:42 AM
 -- Phiên bản máy phục vụ: 8.3.0
 -- Phiên bản PHP: 8.2.18
 
@@ -160,17 +160,13 @@ CREATE TABLE IF NOT EXISTS `giasize` (
   PRIMARY KEY (`magiasize`),
   KEY `masanpham` (`masanpham`,`masize`),
   KEY `FK_masize1` (`masize`)
-) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `giasize`
 --
 
 INSERT INTO `giasize` (`magiasize`, `masanpham`, `masize`, `gia`) VALUES
-(1, 1, 1, 10000),
-(2, 1, 2, 15000),
-(3, 1, 3, 25000),
-(4, 1, 5, 30000),
 (5, 2, 1, 13000),
 (6, 2, 2, 18000),
 (7, 2, 3, 17500),
@@ -211,10 +207,12 @@ INSERT INTO `giasize` (`magiasize`, `masanpham`, `masize`, `gia`) VALUES
 (42, 22, 2, 25000),
 (43, 23, 1, 20000),
 (44, 23, 2, 25000),
-(45, 25, 1, 15000),
-(46, 25, 2, 20000),
-(47, 27, 1, 15000),
-(48, 27, 2, 20000);
+(49, 1, 1, 1000),
+(50, 1, 2, 1500),
+(51, 1, 3, 2500),
+(52, 1, 5, 3000),
+(53, 25, 1, 1000),
+(54, 25, 2, 2000);
 
 -- --------------------------------------------------------
 
@@ -268,14 +266,14 @@ CREATE TABLE IF NOT EXISTS `sizeproduct` (
   PRIMARY KEY (`masizeproduct`),
   KEY `masizesanpham` (`masize`,`masanpham`),
   KEY `FK_masp` (`masanpham`)
-) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=69 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `sizeproduct`
 --
 
 INSERT INTO `sizeproduct` (`masizeproduct`, `masize`, `masanpham`) VALUES
-(1, 1, 1),
+(63, 1, 1),
 (5, 1, 2),
 (9, 1, 3),
 (13, 1, 4),
@@ -287,9 +285,8 @@ INSERT INTO `sizeproduct` (`masizeproduct`, `masize`, `masanpham`) VALUES
 (42, 1, 13),
 (47, 1, 22),
 (49, 1, 23),
-(51, 1, 25),
-(53, 1, 27),
-(2, 2, 1),
+(67, 1, 25),
+(64, 2, 1),
 (6, 2, 2),
 (10, 2, 3),
 (14, 2, 4),
@@ -301,9 +298,8 @@ INSERT INTO `sizeproduct` (`masizeproduct`, `masize`, `masanpham`) VALUES
 (43, 2, 13),
 (48, 2, 22),
 (50, 2, 23),
-(52, 2, 25),
-(54, 2, 27),
-(3, 3, 1),
+(68, 2, 25),
+(65, 3, 1),
 (7, 3, 2),
 (11, 3, 3),
 (15, 3, 4),
@@ -313,7 +309,7 @@ INSERT INTO `sizeproduct` (`masizeproduct`, `masize`, `masanpham`) VALUES
 (31, 3, 8),
 (35, 3, 11),
 (44, 3, 13),
-(4, 5, 1),
+(66, 5, 1),
 (8, 5, 2),
 (12, 5, 3),
 (16, 5, 4),
@@ -400,8 +396,8 @@ ALTER TABLE `donhang`
 -- Các ràng buộc cho bảng `giasize`
 --
 ALTER TABLE `giasize`
-  ADD CONSTRAINT `FK_masize1` FOREIGN KEY (`masize`) REFERENCES `sizeproduct` (`masize`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `FK_msanpham1` FOREIGN KEY (`masanpham`) REFERENCES `sizeproduct` (`masanpham`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `FK_masize1` FOREIGN KEY (`masize`) REFERENCES `sizesanpham` (`masize`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  ADD CONSTRAINT `FK_msanpham1` FOREIGN KEY (`masanpham`) REFERENCES `sizeproduct` (`masanpham`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 --
 -- Các ràng buộc cho bảng `products`

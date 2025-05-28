@@ -11,12 +11,36 @@ export default function Products() {
     const [showAddSizePriceModal, setShowAddSizePriceModal] = useState(false);
     const [selectedProductId, setSelectedProductId] = useState("");
     const [sizePriceList, setSizePriceList] = useState([]);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [editProduct, setEditProduct] = useState({
+        id: null,
+        name: "",
+        category_id: "",
+        sizePrices: []
+    });
     const [newProduct, setNewProduct] = useState({
         name: "",
         image: "",
         category: "",
         sizePrices: []
     });
+    const handleEditProduct = (product) => {
+        // Chuẩn hoá lại sizePrices từ dữ liệu hiện có
+        const sizePrices = product.sizes.map(s => ({
+            sizeId: sizes.find(sz => sz.size === s.size)?.masize,
+            price: s.price
+        }));
+
+        setEditProduct({
+            id: product.id,
+            name: product.name,
+            category_id: categories.find(c => c.name === product.category)?.id || "",
+            sizePrices
+        });
+        fetchSizes(); // Đảm bảo có danh sách size
+        setShowEditModal(true);
+    };
+
     const [categories, setCategories] = useState([]);
     useEffect(() => {
         const fetchCategories = async () => {
@@ -420,6 +444,117 @@ export default function Products() {
                     )}
                 </div>
             )}
+            {/* Modal sửa sản phẩm */}
+            {showEditModal && (
+                <div className="bg-white shadow-md border rounded-lg p-4 mb-6 w-full max-w-2xl text-left">
+                    <div className="bg-white p-6 rounded shadow-md w-[500px]">
+                        <h3 className="text-lg font-bold mb-4">✏️ Sửa sản phẩm</h3>
+                        <form onSubmit={async (e) => {
+                            e.preventDefault();
+                            try {
+                                const validSizePrices = editProduct.sizePrices
+                                    .filter(sp => sp.price !== "" && !isNaN(Number(sp.price)))
+                                    .map(sp => ({
+                                        masize: sp.sizeId,
+                                        gia: Number(sp.price)
+                                    }));
+
+                                const payload = {
+                                    name: editProduct.name,
+                                    category_id: Number(editProduct.category_id),
+                                    sizes: validSizePrices
+                                };
+
+                                await axios.put(`http://localhost:5000/api/products/up/${editProduct.id}`, payload);
+                                alert("Cập nhật sản phẩm thành công!");
+                                setShowEditModal(false);
+                                fetchProducts();
+                            } catch (err) {
+                                console.error("Lỗi khi cập nhật:", err.message);
+                                alert("Cập nhật sản phẩm thất bại!");
+                            }
+                        }}>
+
+                            <input
+                                className="border w-full p-2 mb-2"
+                                value={editProduct.name}
+                                onChange={(e) => setEditProduct(prev => ({ ...prev, name: e.target.value }))}
+                                placeholder="Tên sản phẩm"
+                                required
+                            />
+                            <select
+                                className="border w-full p-2 mb-2"
+                                value={editProduct.category_id}
+                                onChange={(e) => setEditProduct(prev => ({ ...prev, category_id: e.target.value }))}
+                                required
+                            >
+                                <option value="">-- Chọn phân loại --</option>
+                                {categories.map(c => (
+                                    <option key={c.id} value={c.id}>{c.name}</option>
+                                ))}
+                            </select>
+
+                            {sizes.map(sz => (
+                                <div key={sz.masize} className="flex items-center mb-2 gap-2">
+                                    <input
+                                        type="checkbox"
+                                        checked={editProduct.sizePrices.some(sp => sp.sizeId === sz.masize)}
+                                        onChange={() => {
+                                            const exists = editProduct.sizePrices.find(sp => sp.sizeId === sz.masize);
+                                            if (exists) {
+                                                setEditProduct(prev => ({
+                                                    ...prev,
+                                                    sizePrices: prev.sizePrices.filter(sp => sp.sizeId !== sz.masize)
+                                                }));
+                                            } else {
+                                                setEditProduct(prev => ({
+                                                    ...prev,
+                                                    sizePrices: [...prev.sizePrices, { sizeId: sz.masize, price: "" }]
+                                                }));
+                                            }
+                                        }}
+                                    />
+                                    <label>{sz.size}</label>
+                                    <input
+                                        type="number"
+                                        className="border p-1 flex-1"
+                                        placeholder="Giá"
+                                        value={
+                                            editProduct.sizePrices.find(sp => sp.sizeId === sz.masize)?.price || ""
+                                        }
+                                        onChange={(e) => {
+                                            const price = e.target.value;
+                                            setEditProduct(prev => ({
+                                                ...prev,
+                                                sizePrices: prev.sizePrices.map(sp =>
+                                                    sp.sizeId === sz.masize ? { ...sp, price } : sp
+                                                )
+                                            }));
+                                        }}
+                                    />
+                                </div>
+                            ))}
+
+                            <div className="flex justify-end mt-4 gap-2">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowEditModal(false)}
+                                    className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                                >
+                                    Hủy
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="px-4 py-2 bg-[#7a5b4a] text-white rounded hover:bg-[#5d4034]"
+                                >
+                                    Cập nhật
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
             {/* Danh sách sản phẩm */}
             <table className="table-auto border-collapse w-full max-w-5xl text-left">
                 <thead>
@@ -452,7 +587,12 @@ export default function Products() {
                             </td>
                             <td className="border px-4 py-2">{product.createdAt}</td>
                             <td className="border px-4 py-2">
-                                <button className="mr-2 px-2 py-1 bg-[#c2a28b] rounded hover:bg-[#b3907c]">Sửa</button>
+                                <button
+                                    onClick={() => handleEditProduct(product)}
+                                    className="mr-2 px-2 py-1 bg-[#c2a28b] rounded hover:bg-[#b3907c]"
+                                >
+                                    Sửa
+                                </button>
                                 <button className="px-2 py-1 bg-[#d4795b] text-white rounded hover:bg-[#bd644a]">Xoá</button>
                             </td>
                         </tr>
