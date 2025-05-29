@@ -15,6 +15,7 @@ const ordersRoutes = require('./routes/ordersRoutes');
 const orderDetailsRoutes = require('./routes/orderDetailsRoutes');
 const sizeRoutes = require('./routes/sizesanphamRoutes');
 const usersRoutes = require('./routes/usersRoutes');
+const tableRoutes = require('./routes/tableRoutes');
 
 const app = express();
 app.use(express.json());
@@ -98,44 +99,44 @@ app.use('/img', express.static('img'));
       res.status(500).json({ success: false, message: "Không thể lưu device token" });
     }
   });
-   app.post("/api/send-order-notification", async (req, res) => {
+  app.post("/api/send-order-notification", async (req, res) => {
     const { deviceToken } = req.body;
 
     if (!deviceToken) {
-        return res.status(400).json({ message: "Thiếu deviceToken" });
+      return res.status(400).json({ message: "Thiếu deviceToken" });
     }
 
     try {
-        await sendOrderPlacedNotification(deviceToken);
-        res.status(200).json({ message: "Đã gửi thông báo đặt hàng thành công" });
+      await sendOrderPlacedNotification(deviceToken);
+      res.status(200).json({ message: "Đã gửi thông báo đặt hàng thành công" });
     } catch (err) {
-        console.error("❌ Gửi thông báo thất bại:", err);
-        res.status(500).json({ message: "Lỗi khi gửi thông báo" });
+      console.error("❌ Gửi thông báo thất bại:", err);
+      res.status(500).json({ message: "Lỗi khi gửi thông báo" });
     }
-    });
+  });
   // Gửi thông báo cập nhật trạng thái đơn hàng
   app.put("/order/:id/status", async (req, res) => {
-  const madonhang = req.params.id;
-  const { newStatus, deviceToken } = req.body;
+    const madonhang = req.params.id;
+    const { newStatus, deviceToken } = req.body;
 
-  try {
-    const [rows] = await db.query("SELECT * FROM donhang WHERE madonhang = ?", [madonhang]);
-    if (rows.length === 0) {
-      return res.status(404).json({ error: "❌ Đơn hàng không tồn tại" });
+    try {
+      const [rows] = await db.query("SELECT * FROM donhang WHERE madonhang = ?", [madonhang]);
+      if (rows.length === 0) {
+        return res.status(404).json({ error: "❌ Đơn hàng không tồn tại" });
+      }
+
+      // Cập nhật trạng thái đơn hàng trong DB
+      await db.query("UPDATE donhang SET trangthai = ? WHERE madonhang = ?", [newStatus, madonhang]);
+
+      // Gửi thông báo FCM
+      await sendOrderStatusChangedNotification(deviceToken, newStatus, madonhang);
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error("❌ Gửi thông báo thất bại:", error);
+      res.status(500).json({ error: "Không gửi được thông báoa" });
     }
-
-    // Cập nhật trạng thái đơn hàng trong DB
-    await db.query("UPDATE donhang SET trangthai = ? WHERE madonhang = ?", [newStatus, madonhang]);
-
-    // Gửi thông báo FCM
-    await sendOrderStatusChangedNotification(deviceToken, newStatus, madonhang);
-
-    res.json({ success: true });
-  } catch (error) {
-    console.error("❌ Gửi thông báo thất bại:", error);
-    res.status(500).json({ error: "Không gửi được thông báoa" });
-  }
-});
+  });
 
   // Gắn các router phụ
   app.use('/api/employees', employeeRoutes);
@@ -145,6 +146,7 @@ app.use('/img', express.static('img'));
   app.use('/api/order-details', orderDetailsRoutes);
   app.use('/api/size', sizeRoutes);
   app.use('/api', usersRoutes);
+  app.use('/api', tableRoutes);
 
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => console.log(`🚀 Server chạy trên cổng ${PORT}`));

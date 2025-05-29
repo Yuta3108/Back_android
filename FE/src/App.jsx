@@ -32,6 +32,7 @@ import Employees from './pages/Employees';
 import Products from './pages/Products';
 import OrderStatus from './pages/OrderStatus';
 import Users from './pages/Users';
+import Table from './pages/Table';
 export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -46,6 +47,7 @@ export default function App() {
             <Route path="/products" element={<Products />} />
             <Route path="/order-status" element={<OrderStatus />} />
             <Route path="/users" element={<Users />} />
+            <Route path="/table" element={<Table />} />
           </Routes>
         </div>
       </div>
