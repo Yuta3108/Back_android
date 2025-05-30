@@ -1,6 +1,8 @@
 require("dotenv").config({ path: "./.env" });
+const path = require('path');
 const express = require("express");
 const mysql = require("mysql2/promise");
+const multer = require('multer');
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const {
@@ -15,6 +17,7 @@ const ordersRoutes = require('./routes/ordersRoutes');
 const orderDetailsRoutes = require('./routes/orderDetailsRoutes');
 const sizeRoutes = require('./routes/sizesanphamRoutes');
 const usersRoutes = require('./routes/usersRoutes');
+
 
 const app = express();
 app.use(express.json());
@@ -137,15 +140,28 @@ app.use('/img', express.static('img'));
   }
 });
 
-  // Gắn các router phụ
-  app.use('/api/employees', employeeRoutes);
-  app.use('/api/products', productRoutes);
-  app.use('/api/categories', categoryRoutes);
-  app.use('/api/orders', ordersRoutes);
-  app.use('/api/order-details', orderDetailsRoutes);
-  app.use('/api/size', sizeRoutes);
-  app.use('/api', usersRoutes);
 
+
+
+
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Phục vụ file ảnh upload (thư mục 'img')
+app.use('/img', express.static(path.join(__dirname, 'Fe/public/img')));
+
+const comboRoutes = require('./routes/comboRoutes');
+app.use('/api/combos', comboRoutes);
+
+// Gắn các router phụ
+app.use('/api/employees', employeeRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/orders', ordersRoutes);
+app.use('/api/order-details', orderDetailsRoutes);
+app.use('/api/size', sizeRoutes);
+app.use('/api', usersRoutes);
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => console.log(`🚀 Server chạy trên cổng ${PORT}`));
 })();

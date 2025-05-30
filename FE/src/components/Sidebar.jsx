@@ -7,6 +7,7 @@ const menuItems = [
     { to: '/products', label: 'Quản lý Sản phẩm' },
     { to: '/order-status', label: 'Quản lý Trạng thái Đơn hàng' },
     { to: '/users', label: 'Quản lý Khách hàng' },
+    { to: '/combos', label: 'Combo Sản Phẩm' },
 ];
 
 export default function Sidebar() {

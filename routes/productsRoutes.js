@@ -1,50 +1,29 @@
 const express = require('express');
 const router = express.Router();
 const productsController = require('../controllers/productsController');
-const multer = require('multer');
-const path = require('path');
-
-// Thiết lập nơi lưu file và tên file khi upload
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'img'); // lưu ảnh vào thư mục img
-    },
-    filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        const ext = path.extname(file.originalname);
-        cb(null, file.fieldname + '-' + uniqueSuffix + ext);
-    }
-});
-const upload = multer({ storage });
+const { uploadImageMiddleware } = require('../controllers/ImgController');
 
 // ===== ROUTES ===== //
 
 // Lấy tất cả sản phẩm
 router.get('/', productsController.getAllProducts);
 
-// Xoá sản phẩm theo id
-//router.delete('/:id', productsController.deleteProduct);
-
-// Cập nhật sản phẩm theo id
-//router.put('/:id', productsController.updateProduct);
-
-// Cập nhật sản phẩm theo id
+// Cập nhật sản phẩm theo id (kèm size và giá)
 router.put('/up/:id', productsController.updateProductWithSizes);
+
 // API thống kê sản phẩm
 router.get('/stats', productsController.getProductStats);
 
 // Lấy sản phẩm có thông tin size + giá
 router.get('/products-with-sizes', productsController.getProductListWithSizes);
 
-// ✅ Thêm sản phẩm mới (gồm size, giá — KHÔNG CÒN upload ảnh)
-router.post('/', productsController.addProductWithSizes);
+// Thêm sản phẩm mới (kèm upload ảnh)
+router.post('/', uploadImageMiddleware, productsController.addProductWithSizes);
 
-//Thêm 1 giá mới vào size của sản phẩm đã có sẵn 
-router.post('/:id/add-size', productsController.addSizeToExistingProduct);
+// ❌ Tạm thời xóa vì chưa có hàm controller
+// router.post('/:id/add-size', productsController.addSizeToExistingProduct);
 
-//Xóa sản phẩm theo id, kèm xóa size và giá size theo size
+// Xóa sản phẩm theo id, kèm size và giá size
 router.delete('/:id', productsController.deleteProductWithSizes);
-
-
 
 module.exports = router;

@@ -13,7 +13,11 @@ export default function Dashboard() {
             .catch(err => console.error('Lỗi khi lấy thống kê nhân viên:', err));
 
         axios.get('http://localhost:5000/api/products/stats')
-            .then(res => setProductStats(res.data.data))
+        
+            .then(res => {
+            console.log('Product Stats:', res.data); 
+            setProductStats(res.data);
+            })
             .catch(err => console.error('Lỗi khi lấy thống kê sản phẩm:', err));
 
         axios.get('http://localhost:5000/api/orders/stats')
@@ -64,11 +68,11 @@ export default function Dashboard() {
                     </h2>
                     {productStats ? (
                         <div className="text-[#5d4037] text-center space-y-2 text-lg">
-                            <p>Tổng số: <strong>{productStats.total_products}</strong></p>
-                            <p>Tổng giá trị: <strong>{Number(productStats.total_price).toLocaleString()} đ</strong></p>
-                            <p>Giá trung bình: <strong>{Number(productStats.average_price).toLocaleString()} đ</strong></p>
-                            <p>Giá cao nhất: <strong>{Number(productStats.max_price).toLocaleString()} đ</strong></p>
-                            <p>Giá thấp nhất: <strong>{Number(productStats.min_price).toLocaleString()} đ</strong></p>
+                            <p>Tổng số: <strong>{productStats.total.total_products}</strong></p>
+                            <p>Tổng giá trị: <strong>{Number(productStats.total.total_price).toLocaleString()} đ</strong></p>
+                            <p>Giá trung bình: <strong>{Number(productStats.total.average_price).toLocaleString()} đ</strong></p>
+                            <p>Giá cao nhất: <strong>{Number(productStats.total.max_price).toLocaleString()} đ</strong></p>
+                            <p>Giá thấp nhất: <strong>{Number(productStats.total.min_price).toLocaleString()} đ</strong></p>
                         </div>
                     ) : (
                         <p className="text-[#a1887f] text-center text-lg">Đang tải thống kê...</p>
