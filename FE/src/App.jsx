@@ -1,5 +1,4 @@
 
-
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useState } from 'react';
 import Sidebar from './components/Sidebar';
@@ -8,14 +7,10 @@ import Employees from './pages/Employees';
 import Products from './pages/Products';
 import OrderStatus from './pages/OrderStatus';
 import Users from './pages/Users';
-<<<<<<< HEAD
 import ComboManager from './pages/ComboProducts';
-=======
 import Table from './pages/Table';
->>>>>>> 5baf785059f7f3dc0dff97f798fed6c3fb5d10e0
 export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
   return (
     <Router>
       <div className="flex min-h-screen overflow-hidden">
@@ -27,11 +22,8 @@ export default function App() {
             <Route path="/products" element={<Products />} />
             <Route path="/order-status" element={<OrderStatus />} />
             <Route path="/users" element={<Users />} />
-<<<<<<< HEAD
             <Route path='/combos' element={<ComboManager />} />
-=======
             <Route path="/table" element={<Table />} />
->>>>>>> 5baf785059f7f3dc0dff97f798fed6c3fb5d10e0
           </Routes>
         </div>
       </div>
